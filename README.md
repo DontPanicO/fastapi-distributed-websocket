@@ -28,7 +28,36 @@ before, since that instance was managing the connection state.
 a stateful connection is a connection that heavily relies on its state in
 order to work***
 
-In order to solve this issue, ***fastapi-distributed-websockets*** implements a
-way to share Websocket connections information between instances.
+### Broadcasting and group messages
 
-### 
+Another problem of scaling Websockets occurs when we need to send messages to
+multiple connect clients (i.e. broadcasting a message or sending a message to
+all clients subscribed to a specific topic).
+
+Imagine that we have a chat server, and that when an user send a message in a
+specific chat room, we broadcast it to all users subscribed to that room.
+If we have a single server instance, all connection are managed by this instance
+so we can safely trust that the message will be delivered to all recipents.
+On the other hand, with multiple server instances, users subscribing to a chat
+room will probably connect to different instances. This way, if an user send a
+message to the chat room *'xyz'* at the server *A*, users subscribed to the same
+chat room at the server *B* are not receiving it.
+
+### Documenting Websocket interfaces
+
+Another common problem with Websocket, that's not even related to scaling, is
+about documentation. Due to the event driven nature of the Websocket protocol
+it does not fit well to be documented with [openapi](https://swagger.io/specification/).
+However a new specification for asynchronous, event driven interfaces has been
+defined recently. Its name is [asyncapi](https://www.asyncapi.com/) and
+we can use it for this porpouse.
+
+### Other problems
+
+When I came first to think about this library, I started making a lot of research
+of common problems related to Websocket on stackoverflow, reddit, github issues and
+so on. I found some interesting resource that are howevere related to the implementation
+itself. I picked up best solutions and elaborated my owns convergin all of that in
+this library.
+
+## The design
