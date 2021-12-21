@@ -30,8 +30,16 @@ class WebSocketManager:
         return connection
 
     async def remove_connection(self, connection: Connection) -> NoReturn:
+        await connection.close()
         self._disconnect(connection)
-        await self.broadcast({'type': 'disconnect', 'id': connection.id})
+    
+    def raw_remove_connection(self, connection: Connection) -> NoReturn:
+        """
+        Use it after a `WebSocketDisconnect` exception.
+        If `WebSocketDisconnect` exception has been raised, we do not
+        need to call `connection.close()`
+        """
+        self._disconnect(connection)
 
     async def _publish(self, topic: str, message: Any) -> NoReturn:
         for connection in self.active_connections:
