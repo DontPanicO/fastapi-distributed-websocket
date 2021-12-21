@@ -33,7 +33,7 @@ class WebSocketManager:
             if connection.topic == topic:
                 await connection.send_json(message)
 
-    async def publish(self, topic: str, message: Any) -> None:
+    def publish(self, topic: str, message: Any) -> None:
         self._publish_tasks.append(asyncio.create_task(self._publish(topic, message)))
 
     async def _to_broker(self, message: Any) -> None:
