@@ -10,7 +10,7 @@ from .utils import clear_task
 class WebSocketManager:
     def __init__(self, broker_topic) -> NoReturn:
         self.active_connections: list[Connection] = []
-        self._publish_tasks: list[asyncio.Task] = []
+        self._send_tasks: list[asyncio.Task] = []
         self._main_task: Optional[asyncio.Task] = None
         self.broker: Optional[aredis.PubSub] = None
         self.broker_topic: str = broker_topic
@@ -41,13 +41,13 @@ class WebSocketManager:
         """
         self._disconnect(connection)
 
-    async def _publish(self, topic: str, message: Any) -> NoReturn:
+    async def _send(self, topic: str, message: Any) -> NoReturn:
         for connection in self.active_connections:
             if connection.topic == topic:
                 await connection.send_json(message)
 
-    def publish(self, topic: str, message: Any) -> NoReturn:
-        self._publish_tasks.append(asyncio.create_task(self._publish(topic, message)))
+    def send(self, topic: str, message: Any) -> NoReturn:
+        self._send_tasks.append(asyncio.create_task(self._send(topic, message)))
 
     async def _to_broker(self, topic: str, message: Any) -> NoReturn:
         await self.broker.publish(topic, message)
@@ -55,7 +55,7 @@ class WebSocketManager:
     async def _from_broker(self) -> NoReturn:
         while True:
             message = await self.broker.get_message()
-            self.publish(message['channel'], message['data'])
+            self.send(message['channel'], message['data'])
 
     async def broadcast(self, message: Any) -> NoReturn:
         for connection in self.active_connections:
@@ -67,7 +67,7 @@ class WebSocketManager:
 
     async def shutdown(self) -> NoReturn:
         clear_task(self._main_task)
-        for task in self._publish_tasks:
+        for task in self._send_tasks:
             clear_task(task)
         for connection in self.active_connections:
             await connection.close()
