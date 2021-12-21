@@ -1,4 +1,6 @@
 import asyncio
+from typing import Optional, Any, NoReturn
+
 from fastapi import WebSocket, WebSocketDisconnect
 
 from ._connection import Connection
@@ -6,15 +8,17 @@ from .utils import clear_task
 
 
 class WebSocketManager:
-    def __init__(self):
+    def __init__(self) -> NoReturn:
         self.active_connections: list[Connection] = []
         self._publish_tasks: list[asyncio.Task] = []
+        self._main_task: Optional[asyncio.Task] = None
+        self.broker: Optional[aredis.PubSub] = None
 
-    async def _connect(self, connection: Connection) -> None:
+    async def _connect(self, connection: Connection) -> NoReturn:
         await connection.accept()
         self.active_connections.append(connection)
 
-    def _disconnect(self, connection: Connection) -> None:
+    def _disconnect(self, connection: Connection) -> NoReturn:
         self.active_connections.remove(connection)
 
     async def new_connection(
@@ -24,26 +28,35 @@ class WebSocketManager:
         await self._connect(connection)
         return connection
 
-    async def remove_connection(self, connection: Connection) -> None:
+    async def remove_connection(self, connection: Connection) -> NoReturn:
         self._disconnect(connection)
         await self.broadcast({'type': 'disconnect', 'id': connection.id})
 
-    async def _publish(self, topic: str, message: Any) -> None:
+    async def _publish(self, topic: str, message: Any) -> NoReturn:
         for connection in self.active_connections:
             if connection.topic == topic:
                 await connection.send_json(message)
 
-    def publish(self, topic: str, message: Any) -> None:
+    def publish(self, topic: str, message: Any) -> NoReturn:
         self._publish_tasks.append(asyncio.create_task(self._publish(topic, message)))
 
-    async def _to_broker(self, message: Any) -> None:
+    async def _to_broker(self, message: Any) -> NoReturn:
         pass
 
-    async def broadcast(self, message: Any) -> None:
+    async def _from_broker(self) -> NoReturn:
+        while True:
+            message = await self.broker.get_message()
+            self.publish(message['channel'], message['data'])
+
+    async def broadcast(self, message: Any) -> NoReturn:
         for connection in self.active_connections:
             await connection.send_json(message)
+    
+    def startup(self) -> NoReturn:
+        self._main_task = asyncio.create_task(self._from_broker())
 
-    async def shutdown(self) -> None:
+    async def shutdown(self) -> NoReturn:
+        clear_task(self._main_task)
         for task in self._publish_tasks:
             clear_task(task)
         for connection in self.active_connections:
