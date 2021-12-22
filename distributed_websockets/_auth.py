@@ -6,7 +6,7 @@ from fastapi.security.utils import get_authorization_scheme_param
 from fastapi.security import OAuth2PasswordBearer
 
 
-class WebSocketOauth2PasswordBearer(OAuth2PasswordBearer):
+class WebSocketOAuth2PasswordBearer(OAuth2PasswordBearer):
     def __init__(
         self,
         token_url: str,
