@@ -1,7 +1,7 @@
 import asyncio
 from typing import Optional, Any, NoReturn
 
-from fastapi import WebSocket, WebSocketDisconnect
+from fastapi import WebSocket, WebSocketDisconnect, status
 
 from ._connection import Connection
 from .utils import clear_task
@@ -29,8 +29,8 @@ class WebSocketManager:
         await self._connect(connection)
         return connection
 
-    async def remove_connection(self, connection: Connection) -> NoReturn:
-        await connection.close()
+    async def remove_connection(self, connection: Connection, code: int = status.WS_1000_NORMAL_CLOSURE) -> NoReturn:
+        await connection.close(code)
         self._disconnect(connection)
     
     def raw_remove_connection(self, connection: Connection) -> NoReturn:
@@ -70,4 +70,4 @@ class WebSocketManager:
         for task in self._send_tasks:
             clear_task(task)
         for connection in self.active_connections:
-            await connection.close()
+            await self.remove_connection(connection, code=status.WS_1012_SERVICE_RESTART)
