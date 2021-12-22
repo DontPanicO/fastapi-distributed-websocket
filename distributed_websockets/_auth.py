@@ -1,4 +1,5 @@
-import asyncio
+__all__ = ['WebSocketOAuth2PasswordBearer']
+
 from typing import Optional, Any, NoReturn
 
 from fastapi import WebSocket, status
