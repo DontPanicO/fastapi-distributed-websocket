@@ -1,6 +1,6 @@
 from typing import AsyncIterator, Optional, Any, Callable, Awaitable, NoReturn
 
-from fastapi import WebSocket, WebSocketDisconnect
+from fastapi import WebSocket, WebSocketDisconnect, status
 
 
 class Connection:
@@ -13,5 +13,5 @@ class Connection:
         self.send_json: Callable[[Any, str], Awaitable] = websocket.send_json
         self.iter_json: Callable[[], Awaitable] = websocket.iter_json
     
-    async def close(self) -> NoReturn:
-        await self.websocket.close()
+    async def close(self, code: int = status.WS_1000_NORMAL_CLOSURE) -> NoReturn:
+        await self.websocket.close(code)
