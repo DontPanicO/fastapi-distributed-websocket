@@ -1,4 +1,5 @@
-from typing import AsyncIterator, Optional, Any, Callable, Awaitable, NoReturn
+from typing import Optional, Any, Callable, NoReturn
+from collections.abc import Awaitable
 
 from fastapi import WebSocket, WebSocketDisconnect, status
 
