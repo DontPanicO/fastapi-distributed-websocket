@@ -54,7 +54,7 @@ class WebSocketManager:
 
     async def _from_broker(self) -> NoReturn:
         while True:
-            message = await self.broker.get_message()
+            message = await self.broker.get_message(ignore_subscribe_messages=True)
             self.send(message['channel'], message['data'])
 
     async def broadcast(self, message: Any) -> NoReturn:
