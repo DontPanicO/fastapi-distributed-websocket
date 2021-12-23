@@ -19,10 +19,6 @@ def is_valid_json(data: Any) -> bool:
     return True
 
 
-def load_message_data(msg: dict) -> Optional[Any]:
-    if is_valid_json(msg['data']):
-        return json.loads(msg['data'])
-
-
-def dump_message_data(data: Any) -> Optional[str]:
-    return json.dumps(data)
+def serialize(obj: Any) -> Any:
+    assert hasattr(obj, '__serialize__'), 'Object must have __serialize__ method'
+    return obj.__serialize__()
