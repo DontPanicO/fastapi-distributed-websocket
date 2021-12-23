@@ -51,6 +51,9 @@ class WebSocketManager:
 
     async def _to_broker(self, topic: str, message: Any) -> NoReturn:
         await self.broker.publish(topic, message)
+    
+    async def receive(self, message: Any) -> NoReturn:
+        pass
 
     async def _from_broker(self) -> NoReturn:
         while True:
