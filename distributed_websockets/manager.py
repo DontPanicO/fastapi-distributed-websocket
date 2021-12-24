@@ -70,8 +70,8 @@ class WebSocketManager:
         self._main_task = asyncio.create_task(self._from_broker())
 
     async def shutdown(self) -> NoReturn:
-        clear_task(self._main_task)
         for task in self._send_tasks:
             clear_task(task)
         for connection in self.active_connections:
             await self.remove_connection(connection, code=status.WS_1012_SERVICE_RESTART)
+        clear_task(self._main_task)
