@@ -25,6 +25,11 @@ def serialize(obj: Any) -> Any:
     return obj.__serialize__()
 
 
+def deserialize(obj: Any) -> Any:
+    assert hasattr(obj, '__deserialize__'), 'Object must have __deserialize__ method'
+    return obj.__deserialize__()
+
+
 def is_valid_broker(obj: Any) -> bool:
     """
     Helper utils to check if an object can
