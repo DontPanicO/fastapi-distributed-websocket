@@ -1,6 +1,7 @@
 import asyncio
 from typing import Optional, Any, NoReturn
 
+import aioredis
 from fastapi import WebSocket, WebSocketDisconnect, status
 
 from ._connection import Connection
@@ -12,7 +13,7 @@ class WebSocketManager:
         self.active_connections: list[Connection] = []
         self._send_tasks: list[asyncio.Task] = []
         self._main_task: Optional[asyncio.Task] = None
-        self.broker: Optional[aredis.PubSub] = None
+        self.broker: Optional[aioredis.client.PubSub] = None
         self.broker_topic: str = broker_topic
 
     async def _connect(self, connection: Connection) -> NoReturn:
