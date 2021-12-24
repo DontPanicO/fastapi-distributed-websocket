@@ -1,5 +1,6 @@
 import asyncio
 from typing import Optional, Any, NoReturn
+from collections.abc import Coroutine
 
 
 class InMemoryBroker:
@@ -7,16 +8,16 @@ class InMemoryBroker:
         self._subscribers: set = set()
         self._messages: asyncio.Queue = asyncio.Queue()
 
-    async def subscribe(self, topic: str) -> NoReturn:
+    async def subscribe(self, topic: str) -> Coroutine[Any, Any, NoReturn]:
         self._subscribers.add(topic)
 
-    async def unsubscribe(self, topic: str) -> NoReturn:
+    async def unsubscribe(self, topic: str) -> Coroutine[Any, Any, NoReturn]:
         self._subscribers.remove(topic)
 
-    async def publish(self, topic: str, message: Any) -> NoReturn:
+    async def publish(self, topic: str, message: Any) -> Coroutine[Any, Any, NoReturn]:
         await self._messages.put({'channel': topic, 'data': message})
 
-    async def get_message(self) -> Optional[dict]:
+    async def get_message(self) -> Coroutine[Any, Any, Optional[dict]]:
         message = await self._messages.get()
         if message['channel'] in self._subscribers:
             return message
