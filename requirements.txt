@@ -1,1 +1,2 @@
+aioredis==2.0.0
 fastapi==0.70.0
