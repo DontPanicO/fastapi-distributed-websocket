@@ -2,11 +2,11 @@ import asyncio
 from typing import Optional, Any, NoReturn
 from collections.abc import Coroutine
 
-import aioredis
 from fastapi import WebSocket, WebSocketDisconnect, status
 
 from ._connection import Connection
 from .utils import clear_task
+from .types import BrokerT
 
 
 class WebSocketManager:
@@ -14,7 +14,7 @@ class WebSocketManager:
         self.active_connections: list[Connection] = []
         self._send_tasks: list[asyncio.Task] = []
         self._main_task: Optional[asyncio.Task] = None
-        self.broker: Optional[aioredis.client.PubSub] = None
+        self.broker: Optional[BrokerT] = None
         self.broker_channel: str = broker_channel
 
     async def _connect(self, connection: Connection) -> Coroutine[Any, Any, NoReturn]:
