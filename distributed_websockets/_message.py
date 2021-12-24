@@ -1,18 +1,19 @@
 import json
-from typing import Optional, Any, NoReturn
+from typing import Optional, Any, NoReturn, Union
 
-from .utils import is_valid_json
+from .utils import is_valid_json, update
 
 
 def tag_client_message(data: dict, topic: Optional[str] = None) -> Any:
     if not topic:
-        return data.update({'tpye': 'broadcast'})
-    return data.update({'type': 'publish', 'topic': topic})
+        return update(data, **{'type': 'broadcast', 'topic': None})
+    return update(data, **{'type': 'publish', 'topic': topic})
 
 
-def untag_broker_message(data: str) -> Any:
-    msg: dict = json.loads(data)
-    return msg.pop('type'), msg.pop('topic'), msg
+def untag_broker_message(data: Union[dict, str]) -> Any:
+    if isinstance(data, str):
+        data: dict = json.loads(data)
+    return data.pop('type'), data.pop('topic'), data
 
 
 class Message:

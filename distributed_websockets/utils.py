@@ -30,6 +30,12 @@ def deserialize(obj: Any) -> Any:
     return obj.__deserialize__()
 
 
+def update(obj: dict, **kwargs) -> dict:
+    new_obj = obj.copy()
+    new_obj.update(**kwargs)
+    return new_obj
+
+
 def is_valid_broker(obj: Any) -> bool:
     """
     Helper utils to check if an object can
