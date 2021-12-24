@@ -5,19 +5,25 @@ from .utils import is_valid_json
 
 
 class Message:
-    def __init__(self, topic: str, data: Any, type: Optional[str] = None, pattern: Optional[str] = None) -> NoReturn:
+    def __init__(
+        self,
+        topic: str,
+        data: Any,
+        type: Optional[str] = None,
+        pattern: Optional[str] = None,
+    ) -> NoReturn:
         self.topic: str = topic
         self.data: Any = data
         self.type: Optional[str] = type
         self.pattern: Optional[None] = pattern
-    
+
     @property
     def __dict__(self) -> dict:
         return {
             'topic': self.topic,
             'data': self.data,
             'type': self.type,
-            'pattern': self.pattern
+            'pattern': self.pattern,
         }
 
     def __serialize__(self) -> str:
