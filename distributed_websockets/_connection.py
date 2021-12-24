@@ -1,5 +1,5 @@
 from typing import Optional, Any, Callable, NoReturn
-from collections.abc import Awaitable
+from collections.abc import AsyncIterator, Awaitable, Coroutine
 
 from fastapi import WebSocket, WebSocketDisconnect, status
 
@@ -10,9 +10,9 @@ class Connection:
         self.websocket: WebSocket = websocket
         self.id: str = conn_id
         self.topic: Optional[str] = topic
-        self.accept: Callable[[], Awaitable] = websocket.accept
-        self.send_json: Callable[[Any, str], Awaitable] = websocket.send_json
-        self.iter_json: Callable[[], Awaitable] = websocket.iter_json
+        self.accept: Callable[[], Coroutine[Any, Any, None]] = websocket.accept
+        self.send_json: Callable[[Any, str], Coroutine[Any, Any, None]] = websocket.send_json
+        self.iter_json: Callable[[], AsyncIterator] = websocket.iter_json
     
     async def close(self, code: int = status.WS_1000_NORMAL_CLOSURE) -> NoReturn:
         await self.websocket.close(code)
