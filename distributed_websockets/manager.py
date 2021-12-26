@@ -19,6 +19,13 @@ class WebSocketManager:
         self.broker: Optional[BrokerT] = None
         self.broker_channel: str = broker_channel
 
+    async def __aenter__(self) -> Coroutine[Any, Any, 'WebSocketManager']:
+        await self.startup()
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb) -> Coroutine[Any, Any, NoReturn]:
+        await self.shutdown()
+
     async def _connect(self, connection: Connection) -> Coroutine[Any, Any, NoReturn]:
         await connection.accept()
         self.active_connections.append(connection)
