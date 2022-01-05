@@ -126,5 +126,5 @@ async def websocket_endpoint(
         async for msg in connection.iter_json():
             await manager.receive(msg)
     except WebSocketDisconnect:
-        await manager.remove_connection(connection)
+        await manager.raw_remove_connection(connection)
 ```
