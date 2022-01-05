@@ -63,3 +63,68 @@ itself. I picked up best solutions and elaborated my owns convergin all of that 
 this library.
 
 ## Example
+
+This is a basic example using an in memory broker with a single server instance.
+
+```python
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, status
+from distributed_websocket import Connection, WebSocketManager
+
+app = FastAPI()
+manager = WebSocketManager('channel:1', broker_url='memory://')
+...
+
+
+app.on_event('startup')
+async def startup() -> None:
+    ...
+    await manager.startup()
+
+
+app.on_event('shutdown')
+async def shutdown() -> None:
+    ...
+    await manager.shutdown()
+
+
+@app.websocket('/ws/{conn_id}')
+async def websocket_endpoint(
+    ws: WebSocket,
+    conn_id: str,
+    *,
+    topic: Optional[Any] = None,
+) -> None:
+    connection: Connection = await manager.new_connection(ws, conn_id)
+    try:
+        async for msg in connection.iter_json():
+            await manager.broadcast(msg)
+    except WebSocketDisconnect:
+        await manager.raw_remove_connection(connection)
+```
+
+The `manger.new_connection` method create a new Connection object and add it to
+the `manager.active_connections` list. Note that after a WebSocketDisconnect
+is raised, we call `raw_remove_connection`: this method only remove the connection
+object from the `manager.active_connections` list, without calling `connection.close`.
+If you need to close a connection at any other time, you can use `manager.remove_connection`.
+
+Note that here we are using `manager.broadcast` to send the message to all connections managed
+by the WebSocketManager instance. However, this method only work if we have a single server
+instance. If we have multiple server instances, we have to use `manager.receive`, to properly
+send the message to the broker.
+
+```python
+@app.websocket('/ws/{conn_id}')
+async def websocket_endpoint(
+    ws: WebSocket,
+    conn_id: str,
+    *,
+    topic: Optional[Any] = None,
+) -> None:
+    connection: Connection = await manager.new_connection(ws, conn_id)
+    try:
+        async for msg in connection.iter_json():
+            await manager.receive(msg)
+    except WebSocketDisconnect:
+        await manager.remove_connection(connection)
+```
