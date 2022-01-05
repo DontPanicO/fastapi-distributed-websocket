@@ -12,7 +12,7 @@ from ._message import tag_client_message, untag_broker_message
 
 
 class WebSocketManager:
-    def __init__(self, broker_channel) -> NoReturn:
+    def __init__(self, broker_channel, broker_url=None) -> NoReturn:
         self.active_connections: list[Connection] = []
         self._send_tasks: list[asyncio.Task] = []
         self._main_task: Optional[asyncio.Task] = None
