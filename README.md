@@ -1,11 +1,11 @@
-# FastAPI Distributed Websockets
+# FastAPI Distributed Websocket
 
-A library to implement websockets for distibuted system based on FastAPI.
+A library to implement websocket for distibuted system based on FastAPI.
 
 **N.B.: This library is still under development and is not ready for production.**
 
 
-## Problems of scaling websockets among multiple servers in production
+## Problems of scaling websocket among multiple servers in production
 
 Websocket is a relatively new protocol for real time communication over HTTP.
 It establish a druable, stateful, full-duplex connection between clients and the server.
@@ -32,7 +32,7 @@ order to work***
 
 ### Broadcasting and group messages
 
-Another problem of scaling Websockets occurs when we need to send messages to
+Another problem of scaling Websocket occurs when we need to send messages to
 multiple connected clients (i.e. broadcasting a message or sending a message to
 all clients subscribed to a specific topic).
 
