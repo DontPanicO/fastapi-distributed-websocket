@@ -2,7 +2,7 @@
 
 A library to implement websocket for distibuted system based on FastAPI.
 
-**N.B.: This library is still under development and is not ready for production.**
+**N.B.: This library is still under development and is not ready for production yet.**
 
 
 ## Problems of scaling websocket among multiple servers in production
