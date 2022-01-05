@@ -45,7 +45,11 @@ def is_valid_broker(obj: Any) -> bool:
     """
     return (
         (hasattr(obj, 'subscribe') and inspect.iscoroutinefunction(obj.subscribe))
-        and (hasattr(obj, 'unsubscribe') and inspect.iscoroutinefunction(obj.unsubscribe))
+        and (
+            hasattr(obj, 'unsubscribe') and inspect.iscoroutinefunction(obj.unsubscribe)
+        )
         and (hasattr(obj, 'publish') and inspect.iscoroutinefunction(obj.publish))
-        and (hasattr(obj, 'get_message') and inspect.iscoroutinefunction(obj.get_message))
+        and (
+            hasattr(obj, 'get_message') and inspect.iscoroutinefunction(obj.get_message)
+        )
     )

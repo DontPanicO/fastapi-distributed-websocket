@@ -23,7 +23,9 @@ class WebSocketManager:
         await self.startup()
         return self
 
-    async def __aexit__(self, exc_type, exc_val, exc_tb) -> Coroutine[Any, Any, NoReturn]:
+    async def __aexit__(
+        self, exc_type, exc_val, exc_tb
+    ) -> Coroutine[Any, Any, NoReturn]:
         await self.shutdown()
 
     async def _connect(self, connection: Connection) -> Coroutine[Any, Any, NoReturn]:

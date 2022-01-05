@@ -14,7 +14,9 @@ class InMemoryBroker:
     async def unsubscribe(self, channel: str) -> Coroutine[Any, Any, NoReturn]:
         self._subscribers.remove(channel)
 
-    async def publish(self, channel: str, message: Any) -> Coroutine[Any, Any, NoReturn]:
+    async def publish(
+        self, channel: str, message: Any
+    ) -> Coroutine[Any, Any, NoReturn]:
         await self._messages.put({'channel': channel, 'data': message})
 
     async def get_message(self, **kwargs) -> Coroutine[Any, Any, Optional[dict]]:
