@@ -1,6 +1,8 @@
 # FastAPI Distributed Websockets
 
-A library to implement websockets for distibuted system based on FastAPI
+A library to implement websockets for distibuted system based on FastAPI.
+
+**N.B.: This library is still under development and is not ready for production.**
 
 
 ## Problems of scaling websockets among multiple servers in production
@@ -31,7 +33,7 @@ order to work***
 ### Broadcasting and group messages
 
 Another problem of scaling Websockets occurs when we need to send messages to
-multiple connect clients (i.e. broadcasting a message or sending a message to
+multiple connected clients (i.e. broadcasting a message or sending a message to
 all clients subscribed to a specific topic).
 
 Imagine that we have a chat server, and that when an user send a message in a
@@ -60,4 +62,4 @@ so on. I found some interesting resource that are howevere related to the implem
 itself. I picked up best solutions and elaborated my owns convergin all of that in
 this library.
 
-## The design
+## Example
