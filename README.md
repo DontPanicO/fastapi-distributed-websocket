@@ -51,8 +51,10 @@ Another common problem with Websocket, that's not even related to scaling, is
 about documentation. Due to the event driven nature of the Websocket protocol
 it does not fit well to be documented with [openapi](https://swagger.io/specification/).
 However a new specification for asynchronous, event driven interfaces has been
-defined recently. Its name is [asyncapi](https://www.asyncapi.com/) and
-we can use it for this porpouse.
+defined recently. The spec name is [asyncapi](https://www.asyncapi.com/) and I'm
+currently studying it. I don't know if this has to be implemented here or it's
+better having a separate library for this, however this is surely something
+we have to look at.
 
 ### Other problems
 
