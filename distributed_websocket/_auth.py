@@ -17,7 +17,6 @@ class WebSocketOAuth2PasswordBearer(OAuth2PasswordBearer):
         auto_error: bool = True,
     ) -> NoReturn:
         super().__init__(
-            name,
             token_url,
             scheme_name,
             scopes,
