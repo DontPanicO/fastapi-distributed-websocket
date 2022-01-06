@@ -1,14 +1,26 @@
 import asyncio
+from urllib.parse import urlparse
 import json
 from typing import Optional, Any, NoReturn, Union
 from collections.abc import Coroutine
 
+from aioredis import Redis
 from fastapi import WebSocket, WebSocketDisconnect, status
 
 from ._connection import Connection
 from .utils import clear_task
 from .types import BrokerT
 from ._message import tag_client_message, untag_broker_message
+from ._inmemory_broker import InMemoryBroker
+
+
+def _init_broker(url: str) -> BrokerT:
+    parsed_url = urlparse(url)
+    if parsed_url.scheme == 'memory':
+        return InMemoryBroker()
+    elif parsed_url.scheme == 'redis':
+        return Redis.from_url(url).pubsub()
+    raise ValueError('Unsupported broker scheme')
 
 
 class WebSocketManager:
@@ -16,7 +28,7 @@ class WebSocketManager:
         self.active_connections: list[Connection] = []
         self._send_tasks: list[asyncio.Task] = []
         self._main_task: Optional[asyncio.Task] = None
-        self.broker: Optional[BrokerT] = None
+        self.broker: Optional[BrokerT] = _init_broker(broker_url)
         self.broker_channel: str = broker_channel
 
     async def __aenter__(self) -> Coroutine[Any, Any, 'WebSocketManager']:
