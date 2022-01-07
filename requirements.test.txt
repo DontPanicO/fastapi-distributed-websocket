@@ -1,3 +1,4 @@
 asgi-lifespan==1.0.1
 aiohttp==3.8.1
+pytest-aiohttp==0.3.0
 pytest-asyncio==0.16.0
