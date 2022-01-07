@@ -1,6 +1,6 @@
 import asyncio
-from urllib.parse import urlparse
 import json
+from urllib.parse import urlparse
 from typing import Optional, Any, NoReturn, Union
 from collections.abc import Coroutine
 
