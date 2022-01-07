@@ -1,23 +1,30 @@
 import asyncio
+from collections.abc import AsyncGenerator, Generator
 
+import aiohttp
 import pytest
-import httpx
+from asgi_lifespan import LifespanManager
 from fastapi import FastAPI
 
 from .app import app
 
 
 @pytest.fixture(scope='session')
-def event_loop():
+def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
     loop = asyncio.get_event_loop_policy().new_event_loop()
     yield loop
     loop.close()
 
 
-@pytest.fixture(scope='session')
-def app_obj():
+@pytest.fixture
+def app_obj() -> FastAPI:
     return app
 
 
-# @pytest.fixture(scope='session')
-# def client(app_obj: FastAPI):
+@pytest.fixture
+def client(app_obj: FastAPI) -> AsyncGenerator[aiohttp.ClientSession, None]:
+    async with LifespanManager(app_obj):
+        async with aiohttp.ClientSession(
+            base_url='http://testserver', headers={'Content-Type': 'application/json'}
+        ) as session:
+            yield session
