@@ -22,7 +22,7 @@ def app_obj() -> FastAPI:
 
 
 @pytest.fixture
-def client(app_obj: FastAPI) -> AsyncGenerator[aiohttp.ClientSession, None]:
+async def session(app_obj: FastAPI) -> AsyncGenerator[aiohttp.ClientSession, None]:
     async with LifespanManager(app_obj):
         async with aiohttp.ClientSession(
             base_url='http://testserver', headers={'Content-Type': 'application/json'}
