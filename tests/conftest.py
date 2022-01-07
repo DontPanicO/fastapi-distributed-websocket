@@ -1,8 +1,8 @@
 import asyncio
 from collections.abc import AsyncGenerator, Generator
 
-import aiohttp
 import pytest
+import websockets
 from asgi_lifespan import LifespanManager
 from fastapi import FastAPI
 
@@ -21,10 +21,5 @@ def app_obj() -> FastAPI:
     return app
 
 
-@pytest.fixture
-async def session(app_obj: FastAPI) -> AsyncGenerator[aiohttp.ClientSession, None]:
-    async with LifespanManager(app_obj):
-        async with aiohttp.ClientSession(
-            base_url='http://testserver', headers={'Content-Type': 'application/json'}
-        ) as session:
-            yield session
+# @pytest.fixture
+# async def session(app_obj: FastAPI):
