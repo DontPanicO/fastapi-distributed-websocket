@@ -8,13 +8,18 @@ from aioredis import Redis
 from fastapi import WebSocket, WebSocketDisconnect, status
 
 from ._connection import Connection
-from .utils import clear_task
+from .utils import clear_task, is_valid_broker
 from .types import BrokerT
 from ._message import tag_client_message, untag_broker_message
 from ._inmemory_broker import InMemoryBroker
 
 
-def _init_broker(url: str) -> BrokerT:
+def _init_broker(url: str, broker_class: Optional[Any] = None, **kwargs) -> BrokerT:
+    if broker_class:
+        assert is_valid_broker(
+            broker_class
+        ), 'Invalid broker class. Use distributed_websocket.utils.is_valid_broker to check if your broker_class is valid.'
+        return broker_class(**kwargs)
     parsed_url = urlparse(url)
     if parsed_url.scheme == 'memory':
         return InMemoryBroker()
@@ -24,11 +29,19 @@ def _init_broker(url: str) -> BrokerT:
 
 
 class WebSocketManager:
-    def __init__(self, broker_channel, broker_url=None) -> NoReturn:
+    def __init__(
+        self,
+        broker_channel,
+        broker_url: Optional[str] = None,
+        broker_class: Optional[Any] = None,
+        **kwargs,
+    ) -> NoReturn:
         self.active_connections: list[Connection] = []
         self._send_tasks: list[asyncio.Task] = []
         self._main_task: Optional[asyncio.Task] = None
-        self.broker: Optional[BrokerT] = _init_broker(broker_url)
+        self.broker: Optional[BrokerT] = _init_broker(
+            broker_url, broker_class, **kwargs
+        )
         self.broker_channel: str = broker_channel
 
     async def __aenter__(self) -> Coroutine[Any, Any, 'WebSocketManager']:
