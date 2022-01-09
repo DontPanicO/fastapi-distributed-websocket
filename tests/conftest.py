@@ -2,9 +2,10 @@ import asyncio
 from collections.abc import AsyncGenerator, Generator
 
 import pytest
-import websockets
 from asgi_lifespan import LifespanManager
+from httpx import AsyncClient
 from fastapi import FastAPI
+from fastapi.testclient import TestClient
 
 from .app import app
 
@@ -21,5 +22,7 @@ def app_obj() -> FastAPI:
     return app
 
 
-# @pytest.fixture
-# async def session(app_obj: FastAPI):
+@pytest.fixture
+def client(app_obj: FastAPI) -> Generator[TestClient, None, None]:
+    with TestClient(app_obj) as client:
+        yield client
