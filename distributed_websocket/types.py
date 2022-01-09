@@ -6,4 +6,4 @@ import aioredis
 from ._inmemory_broker import InMemoryBroker
 
 
-BrokerT = typing.Union[aioredis.client.PubSub, InMemoryBroker]
+BrokerT = typing.Union[aioredis.client.PubSub, InMemoryBroker, typing.Any]
