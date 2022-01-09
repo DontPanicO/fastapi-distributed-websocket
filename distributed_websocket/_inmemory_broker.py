@@ -8,6 +8,14 @@ class InMemoryBroker:
         self._subscribers: set = set()
         self._messages: asyncio.Queue = asyncio.Queue()
 
+    async def __aenter__(self) -> Coroutine[Any, Any, 'InMemoryBroker']:
+        return self
+
+    async def __aexit__(
+        self, exc_type, exc_val, exc_tb
+    ) -> Coroutine[Any, Any, NoReturn]:
+        pass
+
     async def subscribe(self, channel: str) -> Coroutine[Any, Any, NoReturn]:
         self._subscribers.add(channel)
 
