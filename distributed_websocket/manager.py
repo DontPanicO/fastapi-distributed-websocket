@@ -105,10 +105,7 @@ class WebSocketManager:
     async def _from_broker(self) -> Coroutine[Any, Any, NoReturn]:
         while True:
             typ, topic, message = await self._next_broker_message()
-            if not topic and typ == 'broadcast':
-                self.broadcast(message)
-            else:
-                self.send(topic, message)
+            self.send_msg(message, typ, topic)
 
     async def _broadcast(self, message: Any) -> Coroutine[Any, Any, NoReturn]:
         for connection in self.active_connections:
@@ -116,6 +113,14 @@ class WebSocketManager:
 
     def broadcast(self, message: Any) -> NoReturn:
         self._send_tasks.append(asyncio.create_task(self._broadcast(message)))
+
+    def send_msg(
+        self, message: Any, typ: Optional[str] = None, topic: Optional[str] = None
+    ) -> NoReturn:
+        if not topic and typ == 'broadcast':
+            self.broadcast(message)
+        else:
+            self.send(topic, message)
 
     async def startup(self) -> Coroutine[Any, Any, NoReturn]:
         await self.broker.subscribe(self.broker_channel)
