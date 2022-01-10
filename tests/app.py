@@ -47,7 +47,7 @@ async def shutdown():
 
 @app.websocket('/ws/{conn_id}')
 async def websocket_endpoint(
-    websocket: WebSocket, conn_id: str, user: Optional[Any] = Depends(get_current_user)
+    websocket: WebSocket, conn_id: str
 ) -> Coroutine[Any, Any, NoReturn]:
     connection = await manager.new_connection(websocket, conn_id)
     try:

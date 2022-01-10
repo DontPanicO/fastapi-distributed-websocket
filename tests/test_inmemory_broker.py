@@ -5,7 +5,7 @@ from distributed_websocket import InMemoryBroker
 
 
 @pytest.mark.asyncio
-async def test_broker():
+async def test_broker() -> None:
     async with InMemoryBroker() as broker:
         await broker.subscribe('test')
         await broker.publish('test', 'hello')
