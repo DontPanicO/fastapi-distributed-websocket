@@ -89,13 +89,13 @@ async def websocket_broadcast_endpoint(
     connection = await manager.new_connection(websocket, conn_id)
     try:
         async for message in connection.iter_json():
-            await manager.broadcast(message)
+            manager.broadcast(message)
     except WebSocketDisconnect:
         manager.raw_remove_connection(connection)
 
 
 @app.websocket('/ws/{conn_id}')
-async def websocket_broadcast_endpoint(
+async def websocket_receive_endpoint(
     websocket: WebSocket, conn_id: str
 ) -> Coroutine[Any, Any, NoReturn]:
     connection = await manager.new_connection(websocket, conn_id)
