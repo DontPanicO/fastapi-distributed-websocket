@@ -3,13 +3,12 @@ version: '3.8'
 services:
 
   testapp:
-    image: testapp:latest
-    command: uvicorn tests.app:app --reload
-    ports:
-      - '8000:8000'
+    build: .
+    image: testapp
+    command: uvicorn tests.app:app --host 0.0.0.0 --port 8000
 
   testclient:
-    image: testapp:latest
+    image: testapp
     command: pytest
     depends_on:
       - testapp
