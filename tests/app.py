@@ -56,24 +56,24 @@ async def get_token(websocket: WebSocket) -> Optional[str]:
     return await ws_oauth2_scheme(websocket)
 
 
-async def get_current_user(token: Optional[str] = Depends(get_token)):
+async def get_current_user(token: Optional[str] = Depends(get_token)) -> Any:
     if token is None:
         return None
     return fake_db['users'][fake_decode(token)]
 
 
 @app.on_event('startup')
-async def startup():
+async def startup() -> Coroutine[Any, Any, NoReturn]:
     await manager.startup()
 
 
 @app.on_event('shutdown')
-async def shutdown():
+async def shutdown() -> Coroutine[Any, Any, NoReturn]:
     await manager.shutdown()
 
 
 @app.post('/token')
-def token(username: str, password: str):
+def token(username: str, password: str) -> Any:
     user = authenticate(username, password)
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
@@ -106,7 +106,7 @@ async def websocket_broadcast_endpoint(
 
 @app.websocket('ws/auth/{conn_id}')
 async def websocket_auth_endpoint(
-    websocket: WebSocket, conn_id: str, user: Depends(get_current_user)
+    websocket: WebSocket, conn_id: str, *, user: Any = Depends(get_current_user)
 ) -> Coroutine[Any, Any, NoReturn]:
     connection = await manager.new_connection(websocket, conn_id)
     try:
