@@ -20,8 +20,9 @@ async def test_endpoint(
 async def test_authenticated_endpoint(
     session: aiohttp.ClientSession, event_loop: asyncio.AbstractEventLoop
 ) -> Coroutine[None, None, typing.NoReturn]:
-    auth_rsp = await session.post(
-        '/token', data={'username': 'johndoe', 'password': 'secret'}
+    raw_rsp = await session.post(
+        '/token', json={'username': 'johndoe', 'password': 'secret'}
     )
-    auth_token = auth_rsp.json()['access_token']
-    session.headers.update({'Authorization': f'Bearer {auth_token}'})
+    rsp = await raw_rsp.json()
+    assert 'access_token' in rsp
+    session.headers.update({'Authorization': f'Bearer {rsp["access_token"]}'})
