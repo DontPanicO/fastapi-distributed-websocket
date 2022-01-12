@@ -32,7 +32,7 @@ ws_oauth2_scheme = WebSocketOAuth2PasswordBearer(token_url='/token')
 
 
 def get_user_by_username(username: str) -> Any:
-    return fake_db['users'].get(username, None)
+    return next((usr for usr in fake_db['users'] if usr['username'] == username), None)
 
 
 def check_password(user: Any, password: str) -> bool:
