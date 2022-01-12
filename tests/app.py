@@ -9,6 +9,8 @@ from fastapi import (
     Depends,
     HTTPException,
 )
+from fastapi.responses import JSONResponse
+from fastapi.security import OAuth2PasswordRequestForm
 from distributed_websocket import (
     WebSocketManager,
     Connection,
@@ -72,9 +74,9 @@ async def shutdown() -> Coroutine[Any, Any, NoReturn]:
     await manager.shutdown()
 
 
-@app.post('/token')
-def token(username: str, password: str) -> Any:
-    user = authenticate(username, password)
+@app.post('/token', response_class=JSONResponse)
+def token(data: OAuth2PasswordRequestForm = Depends()) -> Any:
+    user = authenticate(data.username, data.password)
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
     return {'access_token': fake_encode(user)}
