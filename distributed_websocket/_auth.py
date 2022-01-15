@@ -27,7 +27,7 @@ class WebSocketOAuth2PasswordBearer(OAuth2PasswordBearer):
     async def __call__(self, websocket: WebSocket) -> Optional[str]:
         authorization: str = websocket.headers.get('Authorization')
         scheme, param = get_authorization_scheme_param(authorization)
-        if not authorization or scheme.lower() != 'Bearer':
+        if not authorization or scheme.lower() != 'bearer':
             if self.auto_error:
                 await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
             else:
