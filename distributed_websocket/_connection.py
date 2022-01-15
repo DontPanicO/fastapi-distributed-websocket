@@ -19,6 +19,9 @@ class Connection:
         ] = websocket.send_json
         self.iter_json: Callable[[], AsyncIterator] = websocket.iter_json
 
+    async def __aiter__(self) -> AsyncIterator:
+        return self.iter_json()
+
     async def close(
         self, code: int = status.WS_1000_NORMAL_CLOSURE
     ) -> Coroutine[Any, Any, NoReturn]:
