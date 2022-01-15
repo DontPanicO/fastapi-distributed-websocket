@@ -27,7 +27,7 @@ class InMemoryBroker:
     ) -> Coroutine[Any, Any, NoReturn]:
         await self._messages.put({'channel': channel, 'data': message})
 
-    async def get_message(self, **kwargs) -> Coroutine[Any, Any, Optional[dict]]:
+    async def get_message(self, **kwargs) -> Coroutine[Any, Any, dict | None]:
         message = await self._messages.get()
         if message['channel'] in self._subscribers:
             return message

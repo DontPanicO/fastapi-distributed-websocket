@@ -11,9 +11,9 @@ class WebSocketOAuth2PasswordBearer(OAuth2PasswordBearer):
     def __init__(
         self,
         token_url: str,
-        scheme_name: Optional[str] = None,
-        scopes: Optional[dict[str, str]] = None,
-        description: Optional[str] = None,
+        scheme_name: str | None = None,
+        scopes: dict[str, str] | None = None,
+        description: str | None = None,
         auto_error: bool = True,
     ) -> NoReturn:
         super().__init__(
@@ -24,7 +24,7 @@ class WebSocketOAuth2PasswordBearer(OAuth2PasswordBearer):
             auto_error,
         )
 
-    async def __call__(self, websocket: WebSocket) -> Optional[str]:
+    async def __call__(self, websocket: WebSocket) -> str | None:
         authorization: str = websocket.headers.get('Authorization')
         scheme, param = get_authorization_scheme_param(authorization)
         if not authorization or scheme.lower() != 'bearer':

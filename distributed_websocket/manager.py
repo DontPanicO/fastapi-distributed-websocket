@@ -14,7 +14,7 @@ from ._message import tag_client_message, untag_broker_message
 from ._inmemory_broker import InMemoryBroker
 
 
-def _init_broker(url: str, broker_class: Optional[Any] = None, **kwargs) -> BrokerT:
+def _init_broker(url: str, broker_class: Any | None = None, **kwargs) -> BrokerT:
     if broker_class:
         assert is_valid_broker(
             broker_class
@@ -32,16 +32,14 @@ class WebSocketManager:
     def __init__(
         self,
         broker_channel,
-        broker_url: Optional[str] = None,
-        broker_class: Optional[Any] = None,
+        broker_url: str | None = None,
+        broker_class: Any | None = None,
         **kwargs,
     ) -> NoReturn:
         self.active_connections: list[Connection] = []
         self._send_tasks: list[asyncio.Task] = []
-        self._main_task: Optional[asyncio.Task] = None
-        self.broker: Optional[BrokerT] = _init_broker(
-            broker_url, broker_class, **kwargs
-        )
+        self._main_task: asyncio.Task | None = None
+        self.broker: BrokerT | None = _init_broker(broker_url, broker_class, **kwargs)
         self.broker_channel: str = broker_channel
 
     async def __aenter__(self) -> Coroutine[Any, Any, 'WebSocketManager']:
@@ -64,7 +62,7 @@ class WebSocketManager:
         self.active_connections.remove(connection)
 
     async def new_connection(
-        self, websocket: WebSocket, conn_id: str, topic: Optional[str] = None
+        self, websocket: WebSocket, conn_id: str, topic: str | None = None
     ) -> Coroutine[Any, Any, Connection]:
         connection = Connection(websocket, conn_id, topic)
         await self._connect(connection)
@@ -118,7 +116,7 @@ class WebSocketManager:
         self._send_tasks.append(asyncio.create_task(self._broadcast(message)))
 
     def send_msg(
-        self, message: Any, typ: Optional[str] = None, topic: Optional[str] = None
+        self, message: Any, typ: str | None = None, topic: str | None = None
     ) -> NoReturn:
         if not topic and typ == 'broadcast':
             self.broadcast(message)

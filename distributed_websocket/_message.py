@@ -4,7 +4,7 @@ from typing import Optional, Any, NoReturn, Union
 from .utils import is_valid_json, update
 
 
-def tag_client_message(data: dict, topic: Optional[str] = None) -> Any:
+def tag_client_message(data: dict, topic: str | None = None) -> Any:
     if not topic:
         return update(data, **{'type': 'broadcast', 'topic': None})
     return update(data, **{'type': 'publish', 'topic': topic})
