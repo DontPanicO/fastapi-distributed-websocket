@@ -1,7 +1,7 @@
 import asyncio
 import json
 from urllib.parse import urlparse
-from typing import Optional, Any, NoReturn, Union
+from typing import Iterator, Optional, Any, NoReturn, Union
 from collections.abc import Coroutine
 
 from aioredis import Redis
@@ -52,6 +52,9 @@ class WebSocketManager:
         self, exc_type, exc_val, exc_tb
     ) -> Coroutine[Any, Any, NoReturn]:
         await self.shutdown()
+
+    def __iter__(self) -> Iterator:
+        return self.active_connections.__iter__()
 
     async def _connect(self, connection: Connection) -> Coroutine[Any, Any, NoReturn]:
         await connection.accept()
