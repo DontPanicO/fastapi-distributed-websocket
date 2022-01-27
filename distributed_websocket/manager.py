@@ -90,12 +90,12 @@ class WebSocketManager:
     def send(self, topic: str, message: Any) -> NoReturn:
         self._send_tasks.append(asyncio.create_task(self._send(topic, message)))
 
-    async def _to_broker(self, message: Any) -> Coroutine[Any, Any, NoReturn]:
+    async def _publish_to_broker(self, message: Any) -> Coroutine[Any, Any, NoReturn]:
         await self.broker.publish(self.broker_channel, message)
 
     async def receive(self, message: Any) -> Coroutine[Any, Any, NoReturn]:
         msg = tag_client_message(message)
-        await self._to_broker(msg)
+        await self._publish_to_broker(msg)
 
     async def _next_broker_message(self) -> Coroutine[Any, Any, dict | Any]:
         broker_message: dict[str, str] = await self.broker.get_message(
