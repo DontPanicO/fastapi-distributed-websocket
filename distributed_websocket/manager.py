@@ -1,7 +1,7 @@
 import asyncio
 import json
 from urllib.parse import urlparse
-from typing import Iterator, Optional, Any, NoReturn, Union
+from typing import Iterator, Optional, Any, NoReturn
 from collections.abc import Coroutine
 
 from aioredis import Redis
@@ -97,7 +97,7 @@ class WebSocketManager:
         msg = tag_client_message(message)
         await self._to_broker(msg)
 
-    async def _next_broker_message(self) -> Coroutine[Any, Any, Union[dict, Any]]:
+    async def _next_broker_message(self) -> Coroutine[Any, Any, dict | Any]:
         broker_message: dict[str, str] = await self.broker.get_message(
             ignore_subscribe_messages=True
         )
