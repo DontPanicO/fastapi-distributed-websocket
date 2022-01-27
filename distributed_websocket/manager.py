@@ -103,7 +103,7 @@ class WebSocketManager:
         )
         return untag_broker_message(broker_message['data'])
 
-    async def _from_broker(self) -> Coroutine[Any, Any, NoReturn]:
+    async def _broker_listener(self) -> Coroutine[Any, Any, NoReturn]:
         while True:
             typ, topic, message = await self._next_broker_message()
             self.send_msg(message, typ, topic)
@@ -125,7 +125,7 @@ class WebSocketManager:
 
     async def startup(self) -> Coroutine[Any, Any, NoReturn]:
         await self.broker.subscribe(self.broker_channel)
-        self._main_task = asyncio.create_task(self._from_broker())
+        self._main_task = asyncio.create_task(self._broker_listener())
 
     async def shutdown(self) -> Coroutine[Any, Any, NoReturn]:
         for task in self._send_tasks:
