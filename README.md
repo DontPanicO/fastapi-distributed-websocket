@@ -1,6 +1,6 @@
 # FastAPI Distributed Websocket
 
-A library to implement websocket for distibuted system based on FastAPI.
+A library to implement websocket for distibuted systems based on FastAPI.
 
 **N.B.: This library is still under development and is not ready for production yet.**
 
@@ -8,20 +8,20 @@ A library to implement websocket for distibuted system based on FastAPI.
 ## Problems of scaling websocket among multiple servers in production
 
 Websocket is a relatively new protocol for real time communication over HTTP.
-It establish a druable, stateful, full-duplex connection between clients and the server.
+It establishes a druable, stateful, full-duplex connection between clients and the server.
 It can be used to implement chats, real time notifications, broadcasting and
 pub/sub models.
 
 ### Connections from clients
 
 HTTP request/response mechanism fits very well to scale among multiple server
-instances in production. Any time a client make a request, it can connect
+instances in production. Any time a client makes a request, it can connect
 to any server instance and it's going to receive the same response. After
 the response has been returned to the client, it went disconnected and it can
 make another request without the need to hit the same instace as before.
 This thanks to the stateless nature of HTTP.
 
-However, Websocket establish stateful connection between the client and the
+However, Websocket establishes a stateful connection between the client and the
 server and, if some error occurs and the connection went lost, we have to
 ensure that clients are going to hit the same server instance they were connected
 before, since that instance was managing the connection state.
@@ -53,15 +53,15 @@ it does not fit well to be documented with [openapi](https://swagger.io/specific
 However a new specification for asynchronous, event driven interfaces has been
 defined recently. The spec name is [asyncapi](https://www.asyncapi.com/) and I'm
 currently studying it. I don't know if this has to be implemented here or it's
-better having a separate library for this, however this is surely something
+better having a separate library for that, however this is surely something
 we have to look at.
 
 ### Other problems
 
 When I came first to think about this library, I started making a lot of research
 of common problems related to Websocket on stackoverflow, reddit, github issues and
-so on. I found some interesting resource that are howevere related to the implementation
-itself. I picked up best solutions and elaborated my owns convergin all of that in
+so on. I found some interesting resource that are however related to the implementation
+itself. I picked up best solutions and elaborated my owns converging all of that in
 this library.
 
 ## Example
