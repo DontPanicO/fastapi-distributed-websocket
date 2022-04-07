@@ -1,2 +1,2 @@
-aioredis==2.0.0
-fastapi==0.70.0
+aioredis==2.0.1
+fastapi==0.75.1
