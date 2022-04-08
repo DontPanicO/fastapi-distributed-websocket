@@ -1,6 +1,6 @@
 import asyncio
 from abc import ABC, abstractmethod
-from typing import Optional, Any, NoReturn
+from typing import Any, NoReturn
 from collections.abc import Coroutine
 from urllib.parse import urlparse
 

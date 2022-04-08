@@ -1,16 +1,14 @@
 import asyncio
-import json
-from typing import Iterator, Optional, Any, NoReturn
+from typing import Iterator, Any, NoReturn
 from collections.abc import Coroutine
 
-from aioredis import Redis
-from fastapi import WebSocket, WebSocketDisconnect, status
+from fastapi import WebSocket, status
 
 from ._connection import Connection
 from .utils import clear_task, is_valid_broker
 from ._types import BrokerT
 from ._message import tag_client_message, untag_broker_message
-from ._broker import InMemoryBroker, RedisBroker, create_broker
+from ._broker import create_broker
 
 
 def _init_broker(url: str, broker_class: Any | None = None, **kwargs) -> BrokerT:

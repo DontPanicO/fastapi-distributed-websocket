@@ -1,7 +1,7 @@
 import json
-from typing import Optional, Any, NoReturn
+from typing import Any
 
-from .utils import is_valid_json, update
+from .utils import update
 
 
 def tag_client_message(data: dict, topic: str | None = None) -> Any:

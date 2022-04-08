@@ -1,8 +1,7 @@
 import inspect
-from typing import Optional, Any, NoReturn
-
 import asyncio
 import json
+from typing import Any, NoReturn
 
 
 def clear_task(task: asyncio.Task) -> NoReturn:

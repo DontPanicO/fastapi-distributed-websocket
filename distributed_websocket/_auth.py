@@ -1,6 +1,6 @@
 __all__ = ['WebSocketOAuth2PasswordBearer']
 
-from typing import Optional, Any, NoReturn
+from typing import NoReturn
 
 from fastapi import WebSocket, status
 from fastapi.security.utils import get_authorization_scheme_param

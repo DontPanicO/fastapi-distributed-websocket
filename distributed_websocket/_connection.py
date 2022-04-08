@@ -1,7 +1,7 @@
-from typing import Optional, Any, Callable, NoReturn
-from collections.abc import AsyncIterator, Awaitable, Coroutine
+from typing import Any, Callable, NoReturn
+from collections.abc import AsyncIterator, Coroutine
 
-from fastapi import WebSocket, WebSocketDisconnect, status
+from fastapi import WebSocket, status
 
 
 class Connection:
