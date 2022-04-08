@@ -1,6 +1,5 @@
 import asyncio
 import json
-from urllib.parse import urlparse
 from typing import Iterator, Optional, Any, NoReturn
 from collections.abc import Coroutine
 
@@ -9,9 +8,9 @@ from fastapi import WebSocket, WebSocketDisconnect, status
 
 from ._connection import Connection
 from .utils import clear_task, is_valid_broker
-from .types import BrokerT
+from ._types import BrokerT
 from ._message import tag_client_message, untag_broker_message
-from ._inmemory_broker import InMemoryBroker
+from ._broker import InMemoryBroker, RedisBroker, create_broker
 
 
 def _init_broker(url: str, broker_class: Any | None = None, **kwargs) -> BrokerT:
@@ -20,12 +19,7 @@ def _init_broker(url: str, broker_class: Any | None = None, **kwargs) -> BrokerT
             broker_class
         ), 'Invalid broker class. Use distributed_websocket.utils.is_valid_broker to check if your broker_class is valid.'
         return broker_class(**kwargs)
-    parsed_url = urlparse(url)
-    if parsed_url.scheme == 'memory':
-        return InMemoryBroker()
-    elif parsed_url.scheme == 'redis':
-        return Redis.from_url(url).pubsub()
-    raise ValueError('Unsupported broker scheme')
+    return create_broker(url, **kwargs)
 
 
 class WebSocketManager:

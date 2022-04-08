@@ -1,8 +1,8 @@
 from ._auth import WebSocketOAuth2PasswordBearer
 from ._connection import Connection
-from ._inmemory_broker import InMemoryBroker
+from ._broker import BrokerInterface, InMemoryBroker, RedisBroker
+from ._types import BrokerT
 from .manager import WebSocketManager
-from .types import BrokerT
 from .utils import is_valid_broker
 
 
