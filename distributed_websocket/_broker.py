@@ -70,6 +70,10 @@ class RedisBroker(PubSub, BrokerInterface):
     '''
 
 
+def _create_inmemory_broker() -> InMemoryBroker:
+    return InMemoryBroker()
+
+
 def _create_redis_broker(
     redis_url: str,
     shard_hint: str | None = None,
@@ -84,5 +88,5 @@ def create_broker(broker_url: str, **kwargs) -> BrokerInterface:
     if url.scheme == 'redis':
         return _create_redis_broker(url.netloc, **kwargs)
     elif url.scheme == 'memory':
-        return InMemoryBroker()
+        return _create_inmemory_broker()
     raise ValueError(f'Unknown broker url: {broker_url}')
