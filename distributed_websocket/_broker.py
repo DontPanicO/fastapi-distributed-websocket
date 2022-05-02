@@ -70,7 +70,7 @@ class InMemoryBroker(BrokerInterface):
 
     async def get_message(self, **kwargs) -> Coroutine[Any, Any, Message | None]:
         message = await self._messages.get()
-        if self.has_subscribers(message['channel'])
+        if self.has_subscribers(message['channel']):
             typ, topic, data = untag_broker_message(message['data'])
             return Message(typ=typ, topic=topic, data=data)
 
