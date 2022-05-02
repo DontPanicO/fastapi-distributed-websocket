@@ -14,7 +14,7 @@ class BrokerInterface(ABC):
     @abstractmethod
     async def connect(self) -> Coroutine[Any, Any, NoReturn]:
         ...
-    
+
     @abstractmethod
     async def disconnect(self) -> Coroutine[Any, Any, NoReturn]:
         ...
@@ -79,16 +79,19 @@ class InMemoryBroker(BrokerInterface):
 
 
 class RedisBroker(BrokerInterface):
-    def __init__(self, redis_url: str,) -> NoReturn:
+    def __init__(
+        self,
+        redis_url: str,
+    ) -> NoReturn:
         self._redis: Redis = Redis.from_url(redis_url)
         self._pubsub: PubSub = self._redis.pubsub()
-    
+
     async def __aenter__(self) -> Coroutine[Any, Any, BrokerInterface]:
         return self
-    
+
     async def __aexit__(self, exc_type, exc_val, exc_tb) -> NoReturn:
         await self.disconnect()
-    
+
     async def connect(self) -> Coroutine[Any, Any, NoReturn]:
         pass
 
@@ -98,13 +101,15 @@ class RedisBroker(BrokerInterface):
 
     async def subscribe(self, channel: str) -> Coroutine[Any, Any, NoReturn]:
         await self._pubsub.subscribe(channel)
-    
+
     async def unsubscribe(self, channel: str) -> Coroutine[Any, Any, NoReturn]:
         await self._pubsub.unsubscribe(channel)
-    
-    async def publish(self, channel: str, message: Any) -> Coroutine[Any, Any, NoReturn]:
+
+    async def publish(
+        self, channel: str, message: Any
+    ) -> Coroutine[Any, Any, NoReturn]:
         await self._redis.publish(channel, message)
-    
+
     async def get_message(self, **kwargs) -> Coroutine[Any, Any, Message | None]:
         message = await self._pubsub.get_message(ignore_subscribe_messages=True)
         if message:
