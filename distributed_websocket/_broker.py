@@ -12,22 +12,30 @@ from ._message import Message, untag_broker_message
 
 class BrokerInterface(ABC):
     @abstractmethod
+    async def connect(self) -> Coroutine[Any, Any, NoReturn]:
+        ...
+    
+    @abstractmethod
+    async def disconnect(self) -> Coroutine[Any, Any, NoReturn]:
+        ...
+
+    @abstractmethod
     async def subscribe(self, channel: str) -> Coroutine[Any, Any, NoReturn]:
-        pass
+        ...
 
     @abstractmethod
     async def unsubscribe(self, channel: str) -> Coroutine[Any, Any, NoReturn]:
-        pass
+        ...
 
     @abstractmethod
     async def publish(
         self, channel: str, message: Any
     ) -> Coroutine[Any, Any, NoReturn]:
-        pass
+        ...
 
     @abstractmethod
     async def get_message(self, **kwargs) -> Coroutine[Any, Any, Message | None]:
-        pass
+        ...
 
 
 class InMemoryBroker(BrokerInterface):
@@ -41,6 +49,12 @@ class InMemoryBroker(BrokerInterface):
     async def __aexit__(
         self, exc_type, exc_val, exc_tb
     ) -> Coroutine[Any, Any, NoReturn]:
+        pass
+
+    async def connect(self) -> Coroutine[Any, Any, NoReturn]:
+        pass
+
+    async def disconnect(self) -> Coroutine[Any, Any, NoReturn]:
         pass
 
     async def subscribe(self, channel: str) -> Coroutine[Any, Any, NoReturn]:
@@ -73,6 +87,12 @@ class RedisBroker(BrokerInterface):
         return self
     
     async def __aexit__(self, exc_type, exc_val, exc_tb) -> NoReturn:
+        await self.disconnect()
+    
+    async def connect(self) -> Coroutine[Any, Any, NoReturn]:
+        pass
+
+    async def disconnect(self) -> Coroutine[Any, Any, NoReturn]:
         await self._pubsub.reset()
         await self._redis.close()
 
