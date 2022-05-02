@@ -7,7 +7,7 @@ from fastapi import WebSocket, status
 from ._connection import Connection
 from .utils import clear_task, is_valid_broker
 from ._types import BrokerT
-from ._message import tag_client_message, untag_broker_message
+from ._message import tag_client_message, untag_broker_message, Message
 from ._broker import create_broker
 
 
@@ -89,16 +89,13 @@ class WebSocketManager:
         msg = tag_client_message(message)
         await self._publish_to_broker(msg)
 
-    async def _next_broker_message(self) -> Coroutine[Any, Any, dict | Any]:
-        broker_message: dict[str, str] = await self.broker.get_message(
-            ignore_subscribe_messages=True
-        )
-        return untag_broker_message(broker_message['data'])
+    async def _next_broker_message(self) -> Coroutine[Any, Any, Message]:
+        return await self.broker.get_message()
 
     async def _broker_listener(self) -> Coroutine[Any, Any, NoReturn]:
         while True:
-            typ, topic, message = await self._next_broker_message()
-            self.send_msg(message, typ, topic)
+            message = await self._next_broker_message()
+            self.send_msg(message)
 
     async def _broadcast(self, message: Any) -> Coroutine[Any, Any, NoReturn]:
         for connection in self.active_connections:
@@ -107,13 +104,11 @@ class WebSocketManager:
     def broadcast(self, message: Any) -> NoReturn:
         self._send_tasks.append(asyncio.create_task(self._broadcast(message)))
 
-    def send_msg(
-        self, message: Any, typ: str | None = None, topic: str | None = None
-    ) -> NoReturn:
-        if not topic and typ == 'broadcast':
-            self.broadcast(message)
+    def send_msg(self, message: Message) -> NoReturn:
+        if not message.topic and message.typ == 'broadcast':
+            self.broadcast(message.data)
         else:
-            self.send(topic, message)
+            self.send(topic, message.data)
 
     async def startup(self) -> Coroutine[Any, Any, NoReturn]:
         await self.broker.connect()
