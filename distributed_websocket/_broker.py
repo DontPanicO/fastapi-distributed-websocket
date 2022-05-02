@@ -35,7 +35,7 @@ class InMemoryBroker(BrokerInterface):
         self._subscribers: set = set()
         self._messages: asyncio.Queue = asyncio.Queue()
 
-    async def __aenter__(self) -> Coroutine[Any, Any, 'InMemoryBroker']:
+    async def __aenter__(self) -> Coroutine[Any, Any, BrokerInterface]:
         return self
 
     async def __aexit__(
