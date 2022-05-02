@@ -116,6 +116,7 @@ class WebSocketManager:
             self.send(topic, message)
 
     async def startup(self) -> Coroutine[Any, Any, NoReturn]:
+        await self.broker.connect()
         await self.broker.subscribe(self.broker_channel)
         self._main_task = asyncio.create_task(self._broker_listener())
 
@@ -127,3 +128,4 @@ class WebSocketManager:
                 connection, code=status.WS_1012_SERVICE_RESTART
             )
         clear_task(self._main_task)
+        await self.broker.disconnect()
