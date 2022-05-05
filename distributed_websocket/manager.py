@@ -108,7 +108,7 @@ class WebSocketManager:
         if not message.topic and message.typ == 'broadcast':
             self.broadcast(message.data)
         else:
-            self.send(topic, message.data)
+            self.send(message.topic, message.data)
 
     async def startup(self) -> Coroutine[Any, Any, NoReturn]:
         await self.broker.connect()
