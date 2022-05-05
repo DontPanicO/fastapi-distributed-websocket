@@ -21,3 +21,12 @@ class Message:
         self.typ = typ
         self.topic = topic
         self.data = data
+    
+    @classmethod
+    def from_client_message(cls, *, data: Any) -> 'Message':
+        return cls(typ=data['typ'], topic=data['topic'], data=data)
+    
+    def __serialize__(self) -> dict[str, Any]:
+        self.data['typ'] = self.typ
+        self.data['topic'] = self.topic
+        return self.data
