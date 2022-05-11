@@ -82,6 +82,19 @@ class WebSocketManager:
     def send(self, topic: str, message: Any) -> NoReturn:
         self._send_tasks.append(asyncio.create_task(self._send(topic, message)))
 
+    async def _broadcast(self, message: Any) -> Coroutine[Any, Any, NoReturn]:
+        for connection in self.active_connections:
+            await connection.send_json(message)
+
+    def broadcast(self, message: Any) -> NoReturn:
+        self._send_tasks.append(asyncio.create_task(self._broadcast(message)))
+
+    def send_msg(self, message: Message) -> NoReturn:
+        if not message.topic and message.typ == 'broadcast':
+            self.broadcast(message.data)
+        else:
+            self.send(message.topic, message.data)
+
     async def _publish_to_broker(self, message: Any) -> Coroutine[Any, Any, NoReturn]:
         await self.broker.publish(self.broker_channel, message)
 
@@ -96,19 +109,6 @@ class WebSocketManager:
         while True:
             message = await self._next_broker_message()
             self.send_msg(message)
-
-    async def _broadcast(self, message: Any) -> Coroutine[Any, Any, NoReturn]:
-        for connection in self.active_connections:
-            await connection.send_json(message)
-
-    def broadcast(self, message: Any) -> NoReturn:
-        self._send_tasks.append(asyncio.create_task(self._broadcast(message)))
-
-    def send_msg(self, message: Message) -> NoReturn:
-        if not message.topic and message.typ == 'broadcast':
-            self.broadcast(message.data)
-        else:
-            self.send(message.topic, message.data)
 
     async def startup(self) -> Coroutine[Any, Any, NoReturn]:
         await self.broker.connect()
