@@ -76,7 +76,7 @@ class WebSocketManager:
 
     async def _send(self, topic: str, message: Any) -> Coroutine[Any, Any, NoReturn]:
         for connection in self.active_connections:
-            if connection.topic == topic:
+            if topic in connection.topics:
                 await connection.send_json(message)
 
     def send(self, topic: str, message: Any) -> NoReturn:
