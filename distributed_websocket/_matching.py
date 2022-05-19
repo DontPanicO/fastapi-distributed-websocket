@@ -1,4 +1,5 @@
 import sys
+import re
 from abc import ABC, abstractmethod
 from typing import Any, NoReturn
 from collections.abc import Coroutine, Callable
@@ -72,6 +73,17 @@ def _get_matching_function(pattern: str) -> Callable[[str], bool]:
     return getattr(
         __main__,
         f"_match_topic_pattern_{_check_wildcard_pattern(pattern)}_{_check_wildcard_position(pattern)}",
+    )
+
+
+def _match_topic_with_wildcards(topic: str, pattern: str) -> bool:
+    return (
+        topic == pattern
+        or '#' == pattern[:1]
+        or pattern[:1] in (topic[:1], '+')
+        and _match_topic_wildcards(
+            topic[1:], pattern['+' != pattern[:1] or (topic[:1] in '/') * 2 :]
+        )
     )
 
 
