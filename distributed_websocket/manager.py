@@ -9,6 +9,7 @@ from .utils import clear_task, is_valid_broker
 from ._types import BrokerT
 from ._message import tag_client_message, untag_broker_message, Message
 from ._broker import create_broker
+from ._matching import matches
 
 
 def _init_broker(url: str, broker_class: Any | None = None, **kwargs) -> BrokerT:
@@ -76,7 +77,7 @@ class WebSocketManager:
 
     async def _send(self, topic: str, message: Any) -> Coroutine[Any, Any, NoReturn]:
         for connection in self.active_connections:
-            if topic in connection.topics:
+            if matches(topic, connection.topics):
                 await connection.send_json(message)
 
     def send(self, topic: str, message: Any) -> NoReturn:
