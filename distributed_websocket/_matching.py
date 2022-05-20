@@ -13,7 +13,7 @@ def _match_topic_with_wildcards(topic: str, pattern: str) -> bool:
     )
 
 
-def matches(topic: str, patterns: list) -> bool:
+def matches(topic: str, patterns: set) -> bool:
     for pattern in patterns:
         if _match_topic_with_wildcards(topic, pattern):
             return True
