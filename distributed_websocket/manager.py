@@ -5,18 +5,19 @@ from collections.abc import Coroutine
 from fastapi import WebSocket, status
 
 from ._connection import Connection
-from .utils import clear_task, is_valid_broker
+from .utils import clear_task, is_valid_broker, serialize
 from ._types import BrokerT
 from ._message import tag_client_message, untag_broker_message, Message
 from ._broker import create_broker
 from ._matching import matches
+from ._subscriptions import is_subscription_message, handle_subscription_message
 
 
 def _init_broker(url: str, broker_class: Any | None = None, **kwargs) -> BrokerT:
     if broker_class:
         assert is_valid_broker(
             broker_class
-        ), 'Invalid broker class. Use distributed_websocket.utils.is_valid_broker to check if your broker_class is valid.'
+        ), "Invalid broker class. Use distributed_websocket.utils.is_valid_broker to check if your broker_class is valid."
         return broker_class(**kwargs)
     return create_broker(url, **kwargs)
 
@@ -35,7 +36,7 @@ class WebSocketManager:
         self.broker: BrokerT | None = _init_broker(broker_url, broker_class, **kwargs)
         self.broker_channel: str = broker_channel
 
-    async def __aenter__(self) -> Coroutine[Any, Any, 'WebSocketManager']:
+    async def __aenter__(self) -> Coroutine[Any, Any, "WebSocketManager"]:
         await self.startup()
         return self
 
@@ -91,7 +92,7 @@ class WebSocketManager:
         self._send_tasks.append(asyncio.create_task(self._broadcast(message)))
 
     def send_msg(self, message: Message) -> NoReturn:
-        if not message.topic and message.typ == 'broadcast':
+        if not message.topic and message.typ == "broadcast":
             self.broadcast(message.data)
         else:
             self.send(message.topic, message.data)
@@ -99,9 +100,20 @@ class WebSocketManager:
     async def _publish_to_broker(self, message: Any) -> Coroutine[Any, Any, NoReturn]:
         await self.broker.publish(self.broker_channel, message)
 
-    async def receive(self, message: Any) -> Coroutine[Any, Any, NoReturn]:
-        msg = tag_client_message(message)
-        await self._publish_to_broker(msg)
+    async def _handle_client_message(
+        self, connection: Connection, message: Message
+    ) -> Coroutine[Any, Any, NoReturn]:
+        if is_subscription_message(message):
+            handle_subscription_message(connection, message)
+        else:
+            await self._publish_to_broker(serialize(message))
+
+    async def receive(
+        self, connection: Connection, message: Any
+    ) -> Coroutine[Any, Any, NoReturn]:
+        await self._handle_client_message(
+            connection, Message.from_client_message(tag_client_message(message))
+        )
 
     async def _next_broker_message(self) -> Coroutine[Any, Any, Message]:
         return await self.broker.get_message()
@@ -120,8 +132,6 @@ class WebSocketManager:
         for task in self._send_tasks:
             clear_task(task)
         for connection in self.active_connections:
-            await self.close_connection(
-                connection, code=status.WS_1012_SERVICE_RESTART
-            )
+            await self.close_connection(connection, code=status.WS_1012_SERVICE_RESTART)
         clear_task(self._main_task)
         await self.broker.disconnect()
