@@ -61,13 +61,13 @@ class WebSocketManager:
         await self._connect(connection)
         return connection
 
-    async def remove_connection(
+    async def close_connection(
         self, connection: Connection, code: int = status.WS_1000_NORMAL_CLOSURE
     ) -> Coroutine[Any, Any, NoReturn]:
         await connection.close(code)
         self._disconnect(connection)
 
-    def raw_remove_connection(self, connection: Connection) -> NoReturn:
+    def remove_connection(self, connection: Connection) -> NoReturn:
         """
         Use it after a `WebSocketDisconnect` exception.
         If `WebSocketDisconnect` exception has been raised, we do not
@@ -120,7 +120,7 @@ class WebSocketManager:
         for task in self._send_tasks:
             clear_task(task)
         for connection in self.active_connections:
-            await self.remove_connection(
+            await self.close_connection(
                 connection, code=status.WS_1012_SERVICE_RESTART
             )
         clear_task(self._main_task)

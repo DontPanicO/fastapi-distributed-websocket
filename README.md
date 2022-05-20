@@ -101,14 +101,14 @@ async def websocket_endpoint(
         async for msg in connection.iter_json():
             await manager.broadcast(msg)
     except WebSocketDisconnect:
-        await manager.raw_remove_connection(connection)
+        await manager.remove_connection(connection)
 ```
 
 The `manger.new_connection` method create a new Connection object and add it to
 the `manager.active_connections` list. Note that after a WebSocketDisconnect
-is raised, we call `raw_remove_connection`: this method only remove the connection
+is raised, we call `remove_connection`: this method only remove the connection
 object from the `manager.active_connections` list, without calling `connection.close`.
-If you need to close a connection at any other time, you can use `manager.remove_connection`.
+If you need to close a connection at any other time, you can use `manager.close_connection`.
 
 Note that here we are using `manager.broadcast` to send the message to all connections managed
 by the WebSocketManager instance. However, this method only work if we have a single server
@@ -128,5 +128,5 @@ async def websocket_endpoint(
         async for msg in connection.iter_json():
             await manager.receive(msg)
     except WebSocketDisconnect:
-        await manager.raw_remove_connection(connection)
+        await manager.remove_connection(connection)
 ```
