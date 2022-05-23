@@ -6,7 +6,9 @@ class WebSocketException(BaseException):
     '''
     Base class for all WebSocket exceptions, other than
     those provided by FastAPI.
-    Its main purpose is to provide a message to the client.
+    Its main purpose is to provide a message to the client,
+    keeping a reference to the connection object that the
+    exception handler can use.
     '''
     
     def __init__(self, message: str, *, connection: Connection) -> NoReturn:
