@@ -17,14 +17,14 @@ def untag_broker_message(data: dict | str) -> Any:
 
 
 class Message:
-    def __init__(self, *, typ: str, topic: str, data: Any) -> NoReturn:
+    def __init__(self, *, data: Any, typ: str, topic: str | None = None) -> NoReturn:
         self.typ = typ
         self.topic = topic
         self.data = data
     
     @classmethod
     def from_client_message(cls, *, data: Any) -> 'Message':
-        return cls(typ=data['type'], topic=data['topic'], data=data)
+        return cls(data=data, typ=data['type'], topic=data['topic'])
     
     def __serialize__(self) -> dict[str, Any]:
         self.data['type'] = self.typ
