@@ -1,19 +1,27 @@
+from typing import NoReturn
+from ._connection import Connection
+
 class WebSocketException(BaseException):
     '''
     Base class for all WebSocket exceptions, other than
     those provided by FastAPI.
+    Its main purpose is to provide a message to the client.
     '''
-    ...
+    
+    def __init__(self, message: str, *, connection: Connection) -> NoReturn:
+        self.message = message
+        self.connection = connection
+        super().__init__(message)
 
 
-class InvalidSubscription(ValueError):
+class InvalidSubscription(WebSocketException):
     '''
     Raised when a subscription pattern is invalid.
     '''
     ...
 
 
-class InvalidSubscriptionMessage(ValueError):
+class InvalidSubscriptionMessage(WebSocketException):
     '''
     Raised when a subscription message is invalid.
     Differs from `InvalidSubscription` in that it also
