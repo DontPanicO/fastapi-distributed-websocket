@@ -1,6 +1,7 @@
 from typing import NoReturn
 from ._connection import Connection
 
+
 class WebSocketException(BaseException):
     '''
     Base class for all WebSocket exceptions, other than
