@@ -1,4 +1,5 @@
 import asyncio
+import json
 from abc import ABC, abstractmethod
 from typing import Any, NoReturn
 from collections.abc import Coroutine
@@ -108,6 +109,8 @@ class RedisBroker(BrokerInterface):
     async def publish(
         self, channel: str, message: Any
     ) -> Coroutine[Any, Any, NoReturn]:
+        if isinstance(message, dict):
+            message = json.dumps(message)
         await self._redis.publish(channel, message)
 
     async def get_message(self, **kwargs) -> Coroutine[Any, Any, Message | None]:
