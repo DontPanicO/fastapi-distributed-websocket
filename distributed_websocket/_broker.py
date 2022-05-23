@@ -5,8 +5,8 @@ from typing import Any, NoReturn
 from collections.abc import Coroutine
 from urllib.parse import urlparse
 
-from aioredis import Redis
-from aioredis.client import PubSub
+from redis.asyncio import Redis
+from redis.asyncio.client import PubSub
 
 from ._message import Message, untag_broker_message
 
