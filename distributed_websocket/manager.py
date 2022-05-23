@@ -112,7 +112,7 @@ class WebSocketManager:
         self, connection: Connection, message: Any
     ) -> Coroutine[Any, Any, NoReturn]:
         await self._handle_client_message(
-            connection, Message.from_client_message(tag_client_message(message))
+            connection, Message.from_client_message(data=tag_client_message(message))
         )
 
     async def _next_broker_message(self) -> Coroutine[Any, Any, Message]:
