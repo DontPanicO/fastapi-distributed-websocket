@@ -130,7 +130,7 @@ def _create_redis_broker(
 def create_broker(broker_url: str, **kwargs) -> BrokerInterface:
     url = urlparse(broker_url)
     if url.scheme == 'redis':
-        return _create_redis_broker(url.netloc)
+        return _create_redis_broker(broker_url)
     elif url.scheme == 'memory':
         return _create_inmemory_broker()
     raise ValueError(f'Unknown broker url: {broker_url}')
