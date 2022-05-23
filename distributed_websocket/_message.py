@@ -11,7 +11,7 @@ def tag_client_message(data: dict, topic: str | None = None) -> Any:
 
 
 def untag_broker_message(data: dict | str) -> Any:
-    if isinstance(data, str):
+    if isinstance(data, (str, bytes)):
         data: dict = json.loads(data)
     return data.pop('type'), data.pop('topic'), data
 
