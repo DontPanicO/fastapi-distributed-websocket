@@ -2,9 +2,14 @@ version: '3.8'
 
 services:
 
+  redis:
+    image: redis:6.2-alpine
+
   testapp:
     build: .
     image: testapp
+    depends_on:
+      - redis
     command: uvicorn tests.app:app --host 0.0.0.0 --port 8000
 
   testclient:
