@@ -17,7 +17,7 @@ def _init_broker(url: str, broker_class: Any | None = None, **kwargs) -> BrokerT
     if broker_class:
         assert is_valid_broker(
             broker_class
-        ), "Invalid broker class. Use distributed_websocket.utils.is_valid_broker to check if your broker_class is valid."
+        ), 'Invalid broker class. Use distributed_websocket.utils.is_valid_broker to check if your broker_class is valid.'
         return broker_class(**kwargs)
     return create_broker(url, **kwargs)
 
@@ -36,7 +36,7 @@ class WebSocketManager:
         self.broker: BrokerT | None = _init_broker(broker_url, broker_class, **kwargs)
         self.broker_channel: str = broker_channel
 
-    async def __aenter__(self) -> Coroutine[Any, Any, "WebSocketManager"]:
+    async def __aenter__(self) -> Coroutine[Any, Any, 'WebSocketManager']:
         await self.startup()
         return self
 
@@ -69,11 +69,11 @@ class WebSocketManager:
         self._disconnect(connection)
 
     def remove_connection(self, connection: Connection) -> NoReturn:
-        """
+        '''
         Use it after a `WebSocketDisconnect` exception.
         If `WebSocketDisconnect` exception has been raised, we do not
         need to call `connection.close()`
-        """
+        '''
         self._disconnect(connection)
 
     async def _send(self, topic: str, message: Any) -> Coroutine[Any, Any, NoReturn]:
@@ -92,7 +92,7 @@ class WebSocketManager:
         self._send_tasks.append(asyncio.create_task(self._broadcast(message)))
 
     def send_msg(self, message: Message) -> NoReturn:
-        if not message.topic and message.typ == "broadcast":
+        if not message.topic and message.typ == 'broadcast':
             self.broadcast(message.data)
         else:
             self.send(message.topic, message.data)
