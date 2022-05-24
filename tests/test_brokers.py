@@ -22,9 +22,11 @@ async def test_redis_broker() -> None:
         i = 0
         message = await broker.get_message()
         while message is None:
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.01)
             message = await broker.get_message()
-            if i > 10:
+            if i > 2:
                 break
             i += 1
+        assert i < 2
+        print(message, i)
         assert message.data == {'msg': 'hello'}

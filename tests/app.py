@@ -26,7 +26,7 @@ fake_db = {
 }
 
 app = FastAPI()
-manager = WebSocketManager('test-channel', 'memory://')
+manager = WebSocketManager('test-channel', 'redis://redis')
 
 ws_oauth2_scheme = WebSocketOAuth2PasswordBearer(token_url='/token')
 
