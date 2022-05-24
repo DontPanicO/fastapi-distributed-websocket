@@ -121,7 +121,8 @@ class WebSocketManager:
     async def _broker_listener(self) -> Coroutine[Any, Any, NoReturn]:
         while True:
             message = await self._next_broker_message()
-            self.send_msg(message)
+            if message is not None:
+                self.send_msg(message)
 
     async def startup(self) -> Coroutine[Any, Any, NoReturn]:
         await self.broker.connect()
