@@ -4,7 +4,7 @@ from collections.abc import Coroutine, Callable
 from functools import wraps
 
 
-async def _await_maybe(result: Any) -> Any:
+async def _await_maybe(result: Any) -> Coroutine[Any, Any, Any]:
     if inspect.isawaitable(result):
         return await result
     return result
