@@ -2,7 +2,17 @@
 
 A library to implement websocket for distibuted systems based on FastAPI.
 
-**N.B.: This library is still under development and is not ready for production yet.**
+**N.B.: This library is still at an early stage, use it in production at your own risk.**
+
+
+## What it does
+
+The main features of this libarary are:
+
+* Easly implementing broadcasting, pub/sub, chat rooms, etc...
+* Authentication
+* Clean exception handling
+* An in memory broker for fast development
 
 
 ## Problems of scaling websocket among multiple servers in production
