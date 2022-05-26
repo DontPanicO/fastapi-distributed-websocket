@@ -227,10 +227,10 @@ your handler function can easily access it.
 If you need to access connection objects from the exception handler, your custom exceptions
 should inherit from `WebSocketException`, no matter if they are really network related or not.
 
-* **WebSocketException(self, message: str, *, connection: Connection) -> NoReturn**
-* **InvalidSubscription(self, message: str, *, connection: Connection) -> NoReturn** \
+* **WebSocketException(self, message: str, \*, connection: Connection) -> NoReturn**
+* **InvalidSubscription(self, message: str, \*, connection: Connection) -> NoReturn** \
   Raised when a subscription pattern use an invalid syntax. Inherits from `WebSocketException`.
-* **InvalidSubscriptionMessage(self, message: str, *, connection: Connection) -> NoReturn** \
+* **InvalidSubscriptionMessage(self, message: str, \*, connection: Connection) -> NoReturn** \
   Like `InvalidSubscription` it could be raised for bad syntax, but it could also be raised \
   when the message type is not *subscribe* or *unsubscribe*. Inherits from `WebSocketException`.
 
