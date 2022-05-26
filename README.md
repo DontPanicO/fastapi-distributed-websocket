@@ -264,7 +264,7 @@ You can inherit from `BrokerInterface` and override the methods to implement you
   Unsubscribe from a channel.
 * **async publish(self, channel: str, message: Any) -> Coroutine[Any, Any, NoReturn]** \
   Publish a message to a channel.
-* **async get_message(self, **kwargs) -> Coroutine[Any, Any, Message | None]** \
+* **async get_message(self, \*\*kwargs) -> Coroutine[Any, Any, Message | None]** \
   Get a message from the broker.
 
 ### WebSocketManager
