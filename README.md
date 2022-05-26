@@ -36,9 +36,9 @@ server and, if some error occurs and the connection went lost, we have to
 ensure that clients are going to hit the same server instance they were connected
 before, since that instance was managing the connection state.
 
-***Stateful means that there is a state that can be manipulated. In particular,
+`*Stateful means that there is a state that can be manipulated. In particular,
 a stateful connection is a connection that heavily relies on its state in
-order to work***
+order to work`*
 
 ### Broadcasting and group messages
 
@@ -149,13 +149,13 @@ Connection objects wrap the websocket connection and provide a simple interface
 to send and receive messages. They have a `topics` attribute to store subscriptions
 patterns and implement pub/sub models.
 
-* **async accept(self) -> NoReturn** \
+* `**async** accept(self) -> NoReturn` \
   Accept the connection.
-* **async close(self, code: int = 1000) -> NoReturn** \
+* `**async** close(self, code: int = 1000) -> NoReturn` \
   Close the connection with the specified status.
-* **async send_json(self, data: Any) -> NoReturn** \
+* `**async** send_json(self, data: Any) -> NoReturn` \
   Send a json message over the connection.
-* **async iter_json(self) -> AsyncIterator[Any]** \
+* `**async** iter_json(self) -> AsyncIterator[Any]` \
   Iterate over the messages received over the connection.
 
 
@@ -167,16 +167,16 @@ Remeber that messages returned by `connection.iter_json` are already deserialize
 into `dict` objects, so here we call *deserialization* the process of converting
 a `dict` object into a `Message` object.
 
-* **type: str** \
+* `type: str` \
   The message type.
-* **topic: str** \
+* `topic: str` \
   The message topic.
-* **data: Any** \
+* `data: Any` \
   The message data.
 
-* **classmethod from_client_message(cls, \*, data: Any) -> Message** \
+* `classmethod from_client_message(cls, \*, data: Any) -> Message` \
   Create a message from a client message.
-* **__serialize__(self) -> dict** \
+* `__serialize__(self) -> dict` \
   Serialize the message into a `dict` object.
 
 
@@ -191,13 +191,13 @@ This may be confusing, but remember to keep separated the communication between 
 and the clients, that you are developing and the communication between the server and the broker,
 that you usually don't deal with.
 
-* **subscribe(connection: Connection, message: Message) -> NoReturn** \
+* `subscribe(connection: Connection, message: Message) -> NoReturn` \
   Subscribe a connection to `message.topic`.
-* **unsubscribe(connection: Connection, message: Message) -> NoReturn** \
+* `unsubscribe(connection: Connection, message: Message) -> NoReturn` \
   Unsubscribe a connection from `message.topic`.
-* **hanlde_subscription_message(connection: Connection, message: Message) -> NoReturn** \
+* `hanlde_subscription_message(connection: Connection, message: Message) -> NoReturn` \
   Calls `subscribe` or `unsubscribe` depending on the message type.
-* **matches(topic: str, patterns: set[str]) -> bool** \
+* `matches(topic: str, patterns: set[str]) -> bool` \
   Check if `topic` matches any of the patterns in `patterns`.
 
 
@@ -207,7 +207,7 @@ Authentication is provided with the `WebSocketOAuth2PasswordBearer` class.
 It inherits from *FastAPI* `OAuth2PasswordBearer` and overrides `__call__` method to accept
 a `WebSocket` object.
 
-* **async __call__(self, websocket: WebSocket) -> str | None** \
+* `**async** __call__(self, websocket: WebSocket) -> str | None` \
   Authenticate the websocket connection and return the *Authorization* header value. \
   If the authentication fails, return `None` if the objects has been initialized with `auto_error=False` \
   or close the connection with the `WS_1008_POLICY_VIOLATION` code.
@@ -218,7 +218,7 @@ a `WebSocket` object.
 `fastapi-distributed-websocket` provides exception handling via decorators. You can use the
 apposite decorators passing an exception class and a handler callable. Exception handlers
 should accept only the exception object as argument.\
-**Why this is useful?**\
+`Why this is useful?`\
 Because sometimes the same type of exception can be raised by different parts of the application,
 this way you can decorate the higer level function in the call stack to handle the exception at
 any level.\
@@ -227,20 +227,20 @@ your handler function can easily access it.
 If you need to access connection objects from the exception handler, your custom exceptions
 should inherit from `WebSocketException`, no matter if they are really network related or not.
 
-* **WebSocketException(self, message: str, \*, connection: Connection) -> NoReturn**
-* **InvalidSubscription(self, message: str, \*, connection: Connection) -> NoReturn** \
+* `WebSocketException(self, message: str, \*, connection: Connection) -> NoReturn`
+* `InvalidSubscription(self, message: str, \*, connection: Connection) -> NoReturn` \
   Raised when a subscription pattern use an invalid syntax. Inherits from `WebSocketException`.
-* **InvalidSubscriptionMessage(self, message: str, \*, connection: Connection) -> NoReturn** \
+* `InvalidSubscriptionMessage(self, message: str, \*, connection: Connection) -> NoReturn` \
   Like `InvalidSubscription` it could be raised for bad syntax, but it could also be raised \
   when the message type is not *subscribe* or *unsubscribe*. Inherits from `WebSocketException`.
 
-* **handle(exc: BaseException, handler: Callable[..., Any]) -> Callable[..., Any]** \
+* `handle(exc: BaseException, handler: Callable[..., Any]) -> Callable[..., Any]` \
   Decorator to handle exceptions. If you decorate a function with this decorator, at any time \
   an exception of type `exc` is raised or propagated to the function, it will be handled by `handler`. \
   Use this decorator only if both your handler and the function are not async.
-* **async ahandle(
+* `**async** ahandle(
     exc: BaseException, handler: Callable[..., Coroutine[Any, Any, Any]]
-) -> Callable[..., Any]** \
+) -> Callable[..., Any]` \
   Decorator to handle exceptions, same ad `handle`, but the handler is a coroutine function. \
   Use this if your handler is a coroutine function, while the decorated function could be \
   either a sync or an async function.
@@ -254,17 +254,17 @@ other implementation. `fastapi-distributed-websocket` provides an `InMemoryBroke
 for development purposes.
 You can inherit from `BrokerInterface` and override the methods to implement your own broker.
 
-* **async connect(self) -> Coroutine[Any, Any, NoReturn]** \
+* `**async** connect(self) -> Coroutine[Any, Any, NoReturn]` \
   Connect to the broker.
-* **async disconnect(self) -> Coroutine[Any, Any, NoReturn]** \
+* `**async** disconnect(self) -> Coroutine[Any, Any, NoReturn]` \
   Disconnect from the broker.
-* **async subscribe(self, channel: str) -> Coroutine[Any, Any, NoReturn]** \
+* `**async** subscribe(self, channel: str) -> Coroutine[Any, Any, NoReturn]` \
   Subscribe to a channel.
-* **async unsubscribe(self, channel: str) -> Coroutine[Any, Any, NoReturn]** \
+* `**async** unsubscribe(self, channel: str) -> Coroutine[Any, Any, NoReturn]` \
   Unsubscribe from a channel.
-* **async publish(self, channel: str, message: Any) -> Coroutine[Any, Any, NoReturn]** \
+* `**async** publish(self, channel: str, message: Any) -> Coroutine[Any, Any, NoReturn]` \
   Publish a message to a channel.
-* **async get_message(self, \*\*kwargs) -> Coroutine[Any, Any, Message | None]** \
+* `**async** get_message(self, \*\*kwargs) -> Coroutine[Any, Any, Message | None]` \
   Get a message from the broker.
 
 ### WebSocketManager
@@ -277,33 +277,33 @@ spawning a new task for each send. \
 The broker initialisation is done in the constructor while calls to `broker.connect` and
 `broker.disconnect` are handled in the `startup` and `shutdown` methods.
 
-* **async new_connection(
+* `**async** new_connection(
         self, websocket: WebSocket, conn_id: str, topic: str | None = None
-    ) -> Coroutine[Any, Any, Connection]** \
+    ) -> Coroutine[Any, Any, Connection]` \
   Create a new connection object, add it to `self.active_connections` and return it.
-* **async close_connection(
+* `**async** close_connection(
         self, connection: Connection, code: int = status.WS_1000_NORMAL_CLOSURE
-    ) -> Coroutine[Any, Any, NoReturn]** \
+    ) -> Coroutine[Any, Any, NoReturn]` \
   Close a connection object and remove it from `self.active_connections`.
-* **async remove_connection(self, connection: Connection) -> NoReturn** \
+* `**async** remove_connection(self, connection: Connection) -> NoReturn` \
   Remove a connection object from `self.active_connections`.
-* **send(self, topic: str, message: Any) -> NoReturn** \
+* `send(self, topic: str, message: Any) -> NoReturn` \
   Send a message to all the connection objects subscribed to `topic`. \
   It spawns a new task wrapping the coroutine resulting from `self._send`.
-* **broadcast(self, message: Any) -> NoReturn** \
+* `broadcast(self, message: Any) -> NoReturn` \
   Send a message to all the connection objects. \
   It spawns a new task wrapping the coroutine resulting from `self._broadcast`.
-* **send_msg(self, message: Message) -> NoReturn** \
+* `send_msg(self, message: Message) -> NoReturn` \
   Based on the message type, it calls `send` or `broadcast`.
-* **async receive(
+* `**async** receive(
         self, connection: Connection, message: Any
-    ) -> Coroutine[Any, Any, NoReturn]** \
+    ) -> Coroutine[Any, Any, NoReturn]` \
   Receive a message from a connection object. It passes the message down to \
   a private method that handle eventual subscriptions and then publish the message \
   to the broker.
-* **async startup(self) -> Coroutine[Any, Any, NoReturn]** \
+* `**async** startup(self) -> Coroutine[Any, Any, NoReturn]` \
   Start the broker connection and the listener task.
-* **async shutdown(self) -> Coroutine[Any, Any, NoReturn]** \
+* `**async** shutdown(self) -> Coroutine[Any, Any, NoReturn]` \
   Close the broker connection and the listener task. \
   It also takes care to cancel all the tasks spawned by `send` and `broadcast` and \
   close all the connection objects before.
