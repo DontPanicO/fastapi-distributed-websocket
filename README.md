@@ -218,7 +218,7 @@ a `WebSocket` object.
 `fastapi-distributed-websocket` provides exception handling via decorators. You can use the
 apposite decorators passing an exception class and a handler callable. Exception handlers
 should accept only the exception object as argument.\
-`Why this is useful?`\
+**Why this is useful?**\
 Because sometimes the same type of exception can be raised by different parts of the application,
 this way you can decorate the higer level function in the call stack to handle the exception at
 any level.\
