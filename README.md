@@ -174,7 +174,7 @@ a `dict` object into a `Message` object.
 * `data: Any` \
   The message data.
 
-* `classmethod from_client_message(cls, *, data: Any) -> Message` \
+* **`classmethod`**`from_client_message(cls, *, data: Any) -> Message` \
   Create a message from a client message.
 * `__serialize__(self) -> dict` \
   Serialize the message into a `dict` object.
@@ -285,7 +285,7 @@ The broker initialisation is done in the constructor while calls to `broker.conn
         self, connection: Connection, code: int = status.WS_1000_NORMAL_CLOSURE
     ) -> Coroutine[Any, Any, NoReturn]` \
   Close a connection object and remove it from `self.active_connections`.
-* **`async`**` remove_connection(self, connection: Connection) -> NoReturn` \
+* ` remove_connection(self, connection: Connection) -> NoReturn` \
   Remove a connection object from `self.active_connections`.
 * `send(self, topic: str, message: Any) -> NoReturn` \
   Send a message to all the connection objects subscribed to `topic`. \
