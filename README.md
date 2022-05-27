@@ -174,7 +174,7 @@ a `dict` object into a `Message` object.
 * `data: Any` \
   The message data.
 
-* `classmethod from_client_message(cls, \*, data: Any) -> Message` \
+* `classmethod from_client_message(cls, *, data: Any) -> Message` \
   Create a message from a client message.
 * `__serialize__(self) -> dict` \
   Serialize the message into a `dict` object.
@@ -227,10 +227,10 @@ your handler function can easily access it.
 If you need to access connection objects from the exception handler, your custom exceptions
 should inherit from `WebSocketException`, no matter if they are really network related or not.
 
-* `WebSocketException(self, message: str, \*, connection: Connection) -> NoReturn`
-* `InvalidSubscription(self, message: str, \*, connection: Connection) -> NoReturn` \
+* `WebSocketException(self, message: str, *, connection: Connection) -> NoReturn`
+* `InvalidSubscription(self, message: str, *, connection: Connection) -> NoReturn` \
   Raised when a subscription pattern use an invalid syntax. Inherits from `WebSocketException`.
-* `InvalidSubscriptionMessage(self, message: str, \*, connection: Connection) -> NoReturn` \
+* `InvalidSubscriptionMessage(self, message: str, *, connection: Connection) -> NoReturn` \
   Like `InvalidSubscription` it could be raised for bad syntax, but it could also be raised \
   when the message type is not *subscribe* or *unsubscribe*. Inherits from `WebSocketException`.
 
@@ -264,7 +264,7 @@ You can inherit from `BrokerInterface` and override the methods to implement you
   Unsubscribe from a channel.
 * **`async`**` publish(self, channel: str, message: Any) -> Coroutine[Any, Any, NoReturn]` \
   Publish a message to a channel.
-* **`async`**` get_message(self, \*\*kwargs) -> Coroutine[Any, Any, Message | None]` \
+* **`async`**` get_message(self, **kwargs) -> Coroutine[Any, Any, Message | None]` \
   Get a message from the broker.
 
 ### WebSocketManager
