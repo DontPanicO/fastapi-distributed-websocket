@@ -36,9 +36,9 @@ server and, if some error occurs and the connection went lost, we have to
 ensure that clients are going to hit the same server instance they were connected
 before, since that instance was managing the connection state.
 
-`*Stateful means that there is a state that can be manipulated. In particular,
+**Stateful means that there is a state that can be manipulated. In particular,
 a stateful connection is a connection that heavily relies on its state in
-order to work`*
+order to work**
 
 ### Broadcasting and group messages
 
