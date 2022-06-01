@@ -39,16 +39,30 @@ def untag_broker_message(data: dict | str) -> tuple:
 
 
 class Message:
-    def __init__(self, *, data: Any, typ: str, topic: str | None = None) -> NoReturn:
+    def __init__(
+        self,
+        *,
+        data: Any,
+        typ: str,
+        topic: str | None = None,
+        conn_id: str | None = None
+    ) -> NoReturn:
         self.typ = typ
         self.topic = topic
+        self.conn_id = conn_id
         self.data = data
 
     @classmethod
     def from_client_message(cls, *, data: Any) -> 'Message':
-        return cls(data=data, typ=data['type'], topic=data['topic'])
+        return cls(
+            data=data,
+            typ=data.get('type'),
+            topic=data.get('topic'),
+            conn_id=data.get('conn_id'),
+        )
 
     def __serialize__(self) -> dict[str, Any]:
         self.data['type'] = self.typ
         self.data['topic'] = self.topic
+        self.data['conn_id'] = self.conn_id
         return self.data
