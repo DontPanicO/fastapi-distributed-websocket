@@ -4,10 +4,12 @@ from typing import Any, NoReturn
 from .utils import update
 
 
-def tag_client_message(data: dict, topic: str | None = None) -> Any:
-    if not topic:
-        return update(data, **{'type': 'broadcast', 'topic': None})
-    return update(data, **{'type': 'send', 'topic': topic})
+def tag_client_message(data: dict) -> Any:
+    topic = data.get('topic', None)
+    if topic is None:
+        return update(data, **{'type': 'broadcast'})
+    return data
+    
 
 
 def untag_broker_message(data: dict | str) -> Any:
