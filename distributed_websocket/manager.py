@@ -7,7 +7,7 @@ from fastapi import WebSocket, status
 from ._connection import Connection
 from .utils import clear_task, is_valid_broker, serialize
 from ._types import BrokerT
-from ._message import tag_client_message, untag_broker_message, Message
+from ._message import validate_incoming_message, untag_broker_message, Message
 from ._broker import create_broker
 from ._matching import matches
 from ._subscriptions import is_subscription_message, handle_subscription_message
@@ -124,8 +124,9 @@ class WebSocketManager:
     async def receive(
         self, connection: Connection, message: Any
     ) -> Coroutine[Any, Any, NoReturn]:
+        validate_incoming_message(message)
         await self._handle_client_message(
-            connection, Message.from_client_message(data=tag_client_message(message))
+            connection, Message.from_client_message(data=message)
         )
 
     async def _next_broker_message(self) -> Coroutine[Any, Any, Message]:

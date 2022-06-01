@@ -15,6 +15,8 @@ __VALID_TYPES = {
 }
 __SERVER_ONLY_TYPES = {'set_conn_id'}
 __CLIENT_ONLY_TYPES = {'connect'}
+__NULL_TOPIC_ALLOWED_TYPES = {'connect', 'set_conn_id', 'broadcast', 'send_by_conn_id'}
+__REQUIRE_CONN_ID_TYPES = {'set_conn_id', 'send_by_conn_id'}
 
 
 def is_valid_type_message(data: dict) -> bool:
@@ -30,6 +32,16 @@ def tag_client_message(data: dict) -> Any:
     if topic is None:
         return update(data, **{'type': 'broadcast'})
     return data
+
+
+def validate_incoming_message(data: dict) -> NoReturn:
+    typ, topic, conn_id = data.get('type'), data.get('topic'), data.get('conn_id')
+    if not is_valid_type_client_message(data):
+        raise ValueError(f'Invalid message type: {typ}')
+    if topic is None and typ not in __NULL_TOPIC_ALLOWED_TYPES:
+        raise ValueError(f'Invalid message type "{typ}" with no topic')
+    if conn_id is None and typ in __REQUIRE_CONN_ID_TYPES:
+        raise ValueError(f'Invalid message type "{typ}" with no conn_id')
 
 
 def untag_broker_message(data: dict | str) -> tuple:
