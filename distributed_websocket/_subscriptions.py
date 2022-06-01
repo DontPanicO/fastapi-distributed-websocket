@@ -3,8 +3,6 @@ from typing import Any, NoReturn
 from ._connection import Connection
 from ._message import Message
 from ._exceptions import InvalidSubscriptionMessage
-from ._exception_handlers import send_error_message
-from ._decorators import ahandle
 
 
 def is_subscription_message(message: Message) -> bool:
@@ -38,7 +36,6 @@ def unsubscribe(connection: Connection, message: Message) -> NoReturn:
         connection.topics.remove(message.topic)
 
 
-@ahandle(InvalidSubscriptionMessage, send_error_message)
 def handle_subscription_message(connection: Connection, message: Message) -> NoReturn:
     if message.typ == 'subscribe':
         subscribe(connection, message)

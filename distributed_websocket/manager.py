@@ -11,6 +11,9 @@ from ._message import tag_client_message, untag_broker_message, Message
 from ._broker import create_broker
 from ._matching import matches
 from ._subscriptions import is_subscription_message, handle_subscription_message
+from ._exception_handlers import send_error_message
+from ._decorators import ahandle
+from ._exceptions import WebSocketException
 
 
 def _init_broker(url: str, broker_class: Any | None = None, **kwargs) -> BrokerT:
@@ -117,6 +120,7 @@ class WebSocketManager:
         else:
             await self._publish_to_broker(serialize(message))
 
+    @ahandle(WebSocketException, send_error_message)
     async def receive(
         self, connection: Connection, message: Any
     ) -> Coroutine[Any, Any, NoReturn]:
