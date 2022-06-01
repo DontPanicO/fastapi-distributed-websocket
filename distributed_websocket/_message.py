@@ -32,7 +32,7 @@ def tag_client_message(data: dict) -> Any:
     return data
 
 
-def untag_broker_message(data: dict | str) -> Any:
+def untag_broker_message(data: dict | str) -> tuple:
     if isinstance(data, (str, bytes)):
         data: dict = json.loads(data)
     return data.pop('type'), data.pop('topic'), data
