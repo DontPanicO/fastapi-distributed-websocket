@@ -47,7 +47,7 @@ def validate_incoming_message(data: dict) -> NoReturn:
 def untag_broker_message(data: dict | str) -> tuple:
     if isinstance(data, (str, bytes)):
         data: dict = json.loads(data)
-    return data.pop('type'), data.pop('topic'), data
+    return data.pop('type'), data.pop('topic'), data.pop('conn_id'), data
 
 
 class Message:
