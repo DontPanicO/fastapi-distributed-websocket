@@ -78,6 +78,13 @@ class WebSocketManager:
         need to call `connection.close()`
         '''
         self._disconnect(connection)
+    
+    async def _set_conn_id(self, connection: Connection, conn_id: str) -> Coroutine[Any, Any, NoReturn]:
+        connection.conn_id = conn_id
+        await connection.send_json({'type': 'set_conn_id', 'conn_id': conn_id})
+    
+    def set_conn_id(self, connection: Connection, conn_id: str) -> NoReturn:
+        self._send_tasks.append(asyncio.create_task(self._set_conn_id(connection, conn_id)))
 
     async def _send(self, topic: str, message: Any) -> Coroutine[Any, Any, NoReturn]:
         for connection in self.active_connections:
