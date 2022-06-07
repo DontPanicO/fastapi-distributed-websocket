@@ -28,6 +28,6 @@ async def test_authenticated_endpoint(
     assert 'access_token' in rsp
     session.headers.update({'Authorization': f'Bearer {rsp["access_token"]}'})
     async with session.ws_connect('/ws/myid') as ws:
-        await ws.send_json({'message': 'hello'})
+        await ws.send_json({'type': 'broadcast', 'message': 'hello'})
         message = await ws.receive_json()
         assert message == {'message': 'hello'}

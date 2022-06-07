@@ -9,7 +9,7 @@ from distributed_websocket._message import tag_client_message
 async def test_inmemory_broker() -> None:
     async with create_broker('memory://') as broker:
         await broker.subscribe('test')
-        await broker.publish('test', tag_client_message({'msg': 'hello'}))
+        await broker.publish('test', {'type': 'broadcast', 'topic': None, 'conn_id': None, 'msg': 'hello'})
         message = await broker.get_message()
         assert message.data == {'msg': 'hello'}
 
@@ -18,7 +18,7 @@ async def test_inmemory_broker() -> None:
 async def test_redis_broker() -> None:
     async with create_broker('redis://redis') as broker:
         await broker.subscribe('test')
-        await broker.publish('test', tag_client_message({'msg': 'hello'}))
+        await broker.publish('test', {'type': 'broadcast', 'topic': None, 'conn_id': None, 'msg': 'hello'})
         i = 0
         message = await broker.get_message()
         while message is None:
