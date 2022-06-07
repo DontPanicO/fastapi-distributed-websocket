@@ -104,8 +104,10 @@ class WebSocketManager:
         self._send_tasks.append(asyncio.create_task(self._send_by_conn_id(conn_id, message)))
 
     def send_msg(self, message: Message) -> NoReturn:
-        if not message.topic and message.typ == 'broadcast':
+        if message.typ == 'broadcast':
             self.broadcast(message.data)
+        elif message.typ == 'send_by_conn_id':
+            self.send_by_conn_id(message.conn_id, message.data)
         else:
             self.send(message.topic, message.data)
 
