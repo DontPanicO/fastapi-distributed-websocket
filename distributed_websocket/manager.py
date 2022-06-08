@@ -101,7 +101,7 @@ class WebSocketManager:
     def broadcast(self, message: Any) -> NoReturn:
         self._send_tasks.append(asyncio.create_task(self._broadcast(message)))
     
-    async def _send_by_conn_id(self, conn_id: str, message: Any) -> NoReturn:
+    async def _send_by_conn_id(self, conn_id: str, message: Any) -> Coroutine[Any, Any, NoReturn]:
         for connection in self.active_connections:
             if connection.conn_id == conn_id:
                 await connection.send_json(message)
@@ -109,6 +109,10 @@ class WebSocketManager:
     
     def send_by_conn_id(self, conn_id: str, message: Any) -> NoReturn:
         self._send_tasks.append(asyncio.create_task(self._send_by_conn_id(conn_id, message)))
+    
+    def send_to(self, to: list[str], message: Any) -> NoReturn:
+        for conn_id in to:
+            self.send_by_conn_id(conn_id, message)
 
     def send_msg(self, message: Message) -> NoReturn:
         if message.typ == 'broadcast':
