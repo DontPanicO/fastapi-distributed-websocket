@@ -10,7 +10,7 @@ class Connection:
     ) -> NoReturn:
         self.websocket: WebSocket = websocket
         self.id: str = conn_id
-        self.topics: set = {topic} if topic else {}
+        self.topics: set = {topic} if topic else set()
         self.accept: Callable[
             [str | None], Coroutine[Any, Any, NoReturn]
         ] = websocket.accept
