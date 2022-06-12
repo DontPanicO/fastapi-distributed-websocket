@@ -78,13 +78,17 @@ class WebSocketManager:
         need to call `connection.close()`
         '''
         self._disconnect(connection)
-    
-    async def _set_conn_id(self, connection: Connection, conn_id: str) -> Coroutine[Any, Any, NoReturn]:
+
+    async def _set_conn_id(
+        self, connection: Connection, conn_id: str
+    ) -> Coroutine[Any, Any, NoReturn]:
         connection.conn_id = conn_id
         await connection.send_json({'type': 'set_conn_id', 'conn_id': conn_id})
-    
+
     def set_conn_id(self, connection: Connection, conn_id: str) -> NoReturn:
-        self._send_tasks.append(asyncio.create_task(self._set_conn_id(connection, conn_id)))
+        self._send_tasks.append(
+            asyncio.create_task(self._set_conn_id(connection, conn_id))
+        )
 
     async def _send(self, topic: str, message: Any) -> Coroutine[Any, Any, NoReturn]:
         for connection in self.active_connections:
@@ -100,23 +104,36 @@ class WebSocketManager:
 
     def broadcast(self, message: Any) -> NoReturn:
         self._send_tasks.append(asyncio.create_task(self._broadcast(message)))
-    
-    async def _send_by_conn_id(self, conn_id: str, message: Any) -> Coroutine[Any, Any, NoReturn]:
+
+    async def _send_by_conn_id(
+        self, conn_id: str, message: Any
+    ) -> Coroutine[Any, Any, NoReturn]:
         for connection in self.active_connections:
             if connection.id == conn_id:
                 await connection.send_json(message)
                 break
-    
-    def send_by_conn_id(self, conn_id: str, message: Any) -> NoReturn:
-        self._send_tasks.append(asyncio.create_task(self._send_by_conn_id(conn_id, message)))
-    
-    async def _send_multi_by_conn_id(self, conn_ids: list[str], message: Any) -> Coroutine[Any, Any, NoReturn]:
+
+    async def _send_multi_by_conn_id(
+        self, conn_ids: list[str], message: Any
+    ) -> Coroutine[Any, Any, NoReturn]:
         for connection in self.active_connections:
             if connection.id in conn_ids:
                 await connection.send_json(message)
-    
+
+    def send_by_conn_id(self, conn_id: str | list[str], message: Any) -> NoReturn:
+        if isinstance(conn_id, list):
+            self._send_tasks.append(
+                asyncio.create_task(self._send_multi_by_conn_id(conn_id, message))
+            )
+        self._send_tasks.append(
+            asyncio.create_task(self._send_by_conn_id(conn_id, message))
+        )
+
     def send_multi_by_conn_id(self, conn_ids: list[str], message: Any) -> NoReturn:
-        self._send_tasks.append(asyncio.create_task(self._send_multi_by_conn_id(conn_ids, message)))
+        # to be removed
+        self._send_tasks.append(
+            asyncio.create_task(self._send_multi_by_conn_id(conn_ids, message))
+        )
 
     def send_msg(self, message: Message) -> NoReturn:
         if message.typ == 'broadcast':

@@ -57,7 +57,7 @@ class Message:
         data: Any,
         typ: str,
         topic: str | None = None,
-        conn_id: str | None = None
+        conn_id: str | list[str] | None = None
     ) -> NoReturn:
         self.typ = typ
         self.topic = topic
