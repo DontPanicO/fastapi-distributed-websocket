@@ -3,6 +3,7 @@ from ._connection import Connection
 from ._broker import InMemoryBroker, RedisBroker
 from ._types import BrokerT
 from .manager import WebSocketManager
+from .proxy import WebSocketProxy
 from .utils import is_valid_broker
 
 

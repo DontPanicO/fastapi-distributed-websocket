@@ -12,6 +12,7 @@ async def _forward(
     client: WebSocket, target: websockets.WebSocketClientProtocol
 ) -> Coroutine[Any, Any, NoReturn]:
     async for message in client.iter_text():
+        print(f'API Gateway received "{message}" from client. Sending to target...')
         await target.send(message)
 
 
@@ -19,6 +20,7 @@ async def _reverse(
     client: WebSocket, target: websockets.WebSocketClientProtocol
 ) -> Coroutine[Any, Any, NoReturn]:
     async for message in target:
+        print(f'API Gateway received "{message}" from target. Sending to client...')
         await client.send_text(message)
 
 
@@ -26,9 +28,11 @@ class WebSocketProxy:
     def __init__(self, client: WebSocket, server_endpoint: str) -> NoReturn:
         self._client = client
         self._server_endpoint = server_endpoint
-        self._tasks: set[asyncio.Task] = set()
+        self._forward_task: asyncio.Task | None = None
+        self._reverse_task: asyncio.Task | None = None
 
     async def __call__(self) -> Coroutine[Any, Any, NoReturn]:
-        async with websockets.connect(self._server_endpoint) as server:
-            self._tasks.add(asyncio.create_task(_forward(self._client, server)))
-            self._tasks.add(asyncio.create_task(_reverse(self._client, server)))
+        async with websockets.connect(self._server_endpoint) as target:
+            self._forward_task = asyncio.create_task(_forward(self._client, target))
+            self._reverse_task = asyncio.create_task(_reverse(self._client, target))
+            await asyncio.gather(self._forward_task, self._reverse_task)
