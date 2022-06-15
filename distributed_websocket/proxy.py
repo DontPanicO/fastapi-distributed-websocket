@@ -1,4 +1,4 @@
-__all__ = []
+__all__ = ['WebSocketProxy']
 
 import asyncio
 from typing import Any, NoReturn
@@ -29,6 +29,6 @@ class WebSocketProxy:
         self._tasks: set[asyncio.Task] = set()
 
     async def __call__(self) -> Coroutine[Any, Any, NoReturn]:
-        async with websockets.connection(self._server_endpoint) as server:
+        async with websockets.connect(self._server_endpoint) as server:
             self._tasks.add(asyncio.create_task(_forward(self._client, server)))
             self._tasks.add(asyncio.create_task(_reverse(self._client, server)))
