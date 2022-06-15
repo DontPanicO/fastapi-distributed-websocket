@@ -12,7 +12,6 @@ async def _forward(
     client: WebSocket, target: websockets.WebSocketClientProtocol
 ) -> Coroutine[Any, Any, NoReturn]:
     async for message in client.iter_text():
-        print(f'API Gateway received "{message}" from client. Sending to target...')
         await target.send(message)
 
 
@@ -20,7 +19,6 @@ async def _reverse(
     client: WebSocket, target: websockets.WebSocketClientProtocol
 ) -> Coroutine[Any, Any, NoReturn]:
     async for message in target:
-        print(f'API Gateway received "{message}" from target. Sending to client...')
         await client.send_text(message)
 
 
