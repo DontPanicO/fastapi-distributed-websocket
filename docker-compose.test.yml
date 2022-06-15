@@ -12,6 +12,12 @@ services:
       - redis
     command: uvicorn tests.app:app --host 0.0.0.0 --port 8000
 
+  test_api_gateway:
+    image: testapp
+    depends_on:
+      - testapp
+    command: uvicorn tests.api_gateway:app --host 0.0.0.0 --port 8000
+
   testclient:
     image: testapp
     command: pytest

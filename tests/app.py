@@ -87,9 +87,10 @@ async def websocket_broadcast_endpoint(
     connection = await manager.new_connection(websocket, conn_id)
     try:
         async for message in connection.iter_json():
-            manager.broadcast(message)
+            print(f'Target service received "{message}" from api gateway. Broadcasting it back...')
+            await connection.send_json(message)
     except WebSocketDisconnect:
-        manager.raw_remove_connection(connection)
+        manager.remove_connection(connection)
 
 
 @app.websocket('/ws/{conn_id}')
@@ -101,4 +102,4 @@ async def websocket_receive_endpoint(
         async for message in connection.iter_json():
             await manager.receive(connection, message)
     except WebSocketDisconnect:
-        manager.raw_remove_connection(connection)
+        manager.remove_connection(connection)

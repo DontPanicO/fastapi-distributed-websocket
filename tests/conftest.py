@@ -17,5 +17,5 @@ def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
 
 @pytest.fixture
 async def session() -> AsyncGenerator[aiohttp.ClientSession, None]:
-    async with aiohttp.ClientSession('http://testapp:8000') as session:
+    async with aiohttp.ClientSession() as session:
         yield session
