@@ -85,11 +85,9 @@ async def websocket_broadcast_endpoint(
     websocket: WebSocket, conn_id: str
 ) -> Coroutine[Any, Any, NoReturn]:
     connection = await manager.new_connection(websocket, conn_id)
-    try:
-        async for message in connection.iter_json():
-            await connection.send_json(message)
-    except WebSocketDisconnect:
-        manager.remove_connection(connection)
+    async for message in connection.iter_json():
+        await connection.send_json(message)
+    manager.remove_connection(connection)
 
 
 @app.websocket('/ws/{conn_id}')
@@ -97,8 +95,6 @@ async def websocket_receive_endpoint(
     websocket: WebSocket, conn_id: str, user: Optional[Any] = Depends(get_current_user)
 ) -> Coroutine[Any, Any, NoReturn]:
     connection = await manager.new_connection(websocket, conn_id)
-    try:
-        async for message in connection.iter_json():
-            await manager.receive(connection, message)
-    except WebSocketDisconnect:
-        manager.remove_connection(connection)
+    async for message in connection.iter_json():
+        await manager.receive(connection, message)
+    manager.remove_connection(connection)
