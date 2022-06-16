@@ -10,6 +10,7 @@ A library to implement websocket for distibuted systems based on FastAPI.
 The main features of this libarary are:
 
 * Easly implementing broadcasting, pub/sub, chat rooms, etc...
+* Proxy websocket connections to other servers (e.g. from an api gateway)
 * Authentication
 * Clean exception handling
 * An in memory broker for fast development
@@ -74,7 +75,9 @@ so on. I found some interesting resource that are however related to the impleme
 itself. I picked up best solutions and elaborated my owns converging all of that in
 this library.
 
-## Example
+## Examples
+
+### Basic usage
 
 This is a basic example using an in memory broker with a single server instance.
 
@@ -108,17 +111,21 @@ async def websocket_endpoint(
 ) -> None:
     connection: Connection = await manager.new_connection(ws, conn_id)
     try:
-        async for msg in connection.iter_json():
+        while True:
+            msg = await connection.receive_json()
             await manager.broadcast(msg)
     except WebSocketDisconnect:
         await manager.remove_connection(connection)
 ```
 
 The `manger.new_connection` method create a new Connection object and add it to
-the `manager.active_connections` list. Note that after a WebSocketDisconnect
+the `manager.active_connections` list. Note that after a `WebSocketDisconnect`
 is raised, we call `remove_connection`: this method only remove the connection
-object from the `manager.active_connections` list, without calling `connection.close`.
+object from the `manager.active_connections` list, without calling `connection.close`, since
+the connection is already closed.
 If you need to close a connection at any other time, you can use `manager.close_connection`.
+If you use `connection.iter_json`, it already handles the `WebSocketDisconnect` exception, so
+you can simply call `manager.remove_connection` just after the loop (see next code block).
 
 Note that here we are using `manager.broadcast` to send the message to all connections managed
 by the WebSocketManager instance. However, this method only work if we have a single server
@@ -134,11 +141,57 @@ async def websocket_endpoint(
     topic: Optional[Any] = None,
 ) -> None:
     connection: Connection = await manager.new_connection(ws, conn_id)
-    try:
-        async for msg in connection.iter_json():
-            await manager.receive(connection, msg)
-    except WebSocketDisconnect:
-        await manager.remove_connection(connection)
+    # This is the preferred way of handling WebSocketDisconnect
+    async for msg in connection.iter_json():
+        await manager.receive(connection, msg)
+    await manager.remove_connection(connection)
+```
+
+### Proxy from an API gateway
+
+Let's say we are developing a chat service and that all our services are behind
+an API gateway. If we want to keep our websocket service behind it too, then
+fastapi-distributed-websocket provides us with `WebSocketProxy`.
+
+```python
+from distributed_websocket import WebSocketProxy
+# skipped other imports for brevity
+
+app = FastAPI()
+
+
+WS_TARGET_ENDPOINT = 'ws://websocket_service:8000/wshandler'
+
+@app.websocket('/ws')
+async def websocket_proxy(websocket: WebSocket):
+    await websocket.accept()
+    ws_proxy = WebSocketProxy(websocket, WS_TARGET_ENDPOINT)
+    await ws_proxy()
+```
+
+This will forward all messages from the client to the target endpoint and
+all messages from the target endpoint to the client.
+
+Now let's assume that our websocket service code is the code of our previous
+example. Our API Gateway code will be:
+
+```python
+from distributed_websocket import WebSocketProxy
+# skipped other imports for brevity
+
+app = FastAPI()
+
+
+WS_TARGET_ENDPOINT = 'ws://websocket_service:8000/ws/{}'
+
+@app.websocket('/ws/{conn_id}')
+async def websocket_endpoint(
+    ws: WebSocket,
+    conn_id: str,
+) -> None:
+    await websocket.accept()
+    ws_proxy = WebSocketProxy(websocket, WS_TARGET_ENDPOINT.format(conn_id))
+    await ws_proxy()
 ```
 
 ## API Reference
@@ -153,8 +206,10 @@ patterns and implement pub/sub models.
   Accept the connection.
 * **`async`**` close(self, code: int = 1000) -> NoReturn` \
   Close the connection with the specified status.
+* **`async`**` receive_json(self) -> Any` \
+  Receive a JSON message.
 * **`async`**` send_json(self, data: Any) -> NoReturn` \
-  Send a json message over the connection.
+  Send a JSON message over the connection.
 * **`async`**` iter_json(self) -> AsyncIterator[Any]` \
   Iterate over the messages received over the connection.
 
@@ -171,6 +226,8 @@ a `dict` object into a `Message` object.
   The message type.
 * `topic: str` \
   The message topic.
+* `conn_id`: str | list[str] \
+  The connection id or list of connection ids that the message should be sent to.
 * `data: Any` \
   The message data.
 
@@ -287,14 +344,20 @@ The broker initialisation is done in the constructor while calls to `broker.conn
   Close a connection object and remove it from `self.active_connections`.
 * ` remove_connection(self, connection: Connection) -> NoReturn` \
   Remove a connection object from `self.active_connections`.
+* `set_conn_id(self, connection: Connection, conn_id: str) -> NoReturn` \
+  Set the connection id and notify the client.
 * `send(self, topic: str, message: Any) -> NoReturn` \
   Send a message to all the connection objects subscribed to `topic`. \
   It spawns a new task wrapping the coroutine resulting from `self._send`.
 * `broadcast(self, message: Any) -> NoReturn` \
   Send a message to all the connection objects. \
   It spawns a new task wrapping the coroutine resulting from `self._broadcast`.
+* `send_by_conn_id(self, conn_id: str | list[str], message: Any) -> NoReturn` \
+  Send a message to all the connection objects with the given connection id. \
+  It spawns a new task wrapping the coroutine resulting from `self._send_by_conn_id` \
+  if `conn_id` is a string or from `_send_multi_by_conn_id` if it is a list.
 * `send_msg(self, message: Message) -> NoReturn` \
-  Based on the message type, it calls `send` or `broadcast`.
+  Based on the message type, it calls `send`, `send_by_conn_id` or `broadcast`.
 * **`async`**` receive(
         self, connection: Connection, message: Any
     ) -> Coroutine[Any, Any, NoReturn]` \
@@ -307,3 +370,20 @@ The broker initialisation is done in the constructor while calls to `broker.conn
   Close the broker connection and the listener task. \
   It also takes care to cancel all the tasks spawned by `send` and `broadcast` and \
   close all the connection objects before.
+
+
+### WebSocketProxy
+
+The `WebSocketProxy` class initialise callable objects that can be
+used to start proxyng websocket messages from client to a server and viceversa.
+It's initialised with a two parameters:
+
+* **client**: a `WebSocket` object
+* **server_endpoint**: a `str` containing the endpoint of the server
+
+Notice that the target server could be a remote server or the same server that starts the proxy.
+
+* **`async`**` __call__(self) -> Coroutine[Any, Any, NoReturn]` \
+  Start a websocket connection to **server_endpoint** and spawn two tasks: \
+  one that forwards the messages from the client to the target and the other that \
+  forwards the messages from the target to the client.
