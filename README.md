@@ -226,7 +226,7 @@ a `dict` object into a `Message` object.
   The message type.
 * `topic: str` \
   The message topic.
-* `conn_id`: str | list[str] \
+* `conn_id: str | list[str]` \
   The connection id or list of connection ids that the message should be sent to.
 * `data: Any` \
   The message data.
