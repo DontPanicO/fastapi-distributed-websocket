@@ -14,6 +14,9 @@ class Connection:
         self.accept: Callable[
             [str | None], Coroutine[Any, Any, NoReturn]
         ] = websocket.accept
+        self.receive_json: Callable[
+            [str], Coroutine[Any, Any, Any]
+        ] = websocket.receive_json
         self.send_json: Callable[
             [Any, str], Coroutine[Any, Any, NoReturn]
         ] = websocket.send_json
