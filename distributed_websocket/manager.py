@@ -125,9 +125,10 @@ class WebSocketManager:
             self._send_tasks.append(
                 asyncio.create_task(self._send_multi_by_conn_id(conn_id, message))
             )
-        self._send_tasks.append(
-            asyncio.create_task(self._send_by_conn_id(conn_id, message))
-        )
+        else:
+            self._send_tasks.append(
+                asyncio.create_task(self._send_by_conn_id(conn_id, message))
+            )
 
     def send_multi_by_conn_id(self, conn_ids: list[str], message: Any) -> None:
         # to be removed
