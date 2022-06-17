@@ -32,7 +32,7 @@ def unsubscribe(connection: Connection, message: Message) -> None:
             f'"{message}" is not a valid subscription message',
             connection=connection
         )
-    if topic in connection.topics:
+    if message.topic in connection.topics:
         connection.topics.remove(message.topic)
 
 
