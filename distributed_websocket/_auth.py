@@ -1,7 +1,5 @@
 __all__ = ['WebSocketOAuth2PasswordBearer']
 
-from typing import NoReturn
-
 from fastapi import WebSocket, status
 from fastapi.security.utils import get_authorization_scheme_param
 from fastapi.security import OAuth2PasswordBearer
@@ -15,7 +13,7 @@ class WebSocketOAuth2PasswordBearer(OAuth2PasswordBearer):
         scopes: dict[str, str] | None = None,
         description: str | None = None,
         auto_error: bool = True,
-    ) -> NoReturn:
+    ) -> None:
         super().__init__(
             token_url,
             scheme_name,

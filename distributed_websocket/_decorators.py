@@ -1,5 +1,5 @@
 import inspect
-from typing import Any, NoReturn
+from typing import Any
 from collections.abc import Coroutine, Callable
 from functools import wraps
 

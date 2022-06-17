@@ -1,4 +1,4 @@
-from typing import Optional, Any, NoReturn
+from typing import Optional, Any
 from collections.abc import AsyncIterator, Awaitable, Coroutine
 
 from fastapi import (

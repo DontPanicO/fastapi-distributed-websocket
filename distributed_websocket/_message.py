@@ -1,5 +1,5 @@
 import json
-from typing import Any, NoReturn
+from typing import Any
 
 from .utils import update
 
@@ -34,7 +34,7 @@ def tag_client_message(data: dict) -> Any:
     return data
 
 
-def validate_incoming_message(data: dict) -> NoReturn:
+def validate_incoming_message(data: dict) -> None:
     typ, topic, conn_id = data.get('type'), data.get('topic'), data.get('conn_id')
     if not is_valid_type_client_message(data):
         raise ValueError(f'Invalid message type: {typ}')
@@ -58,7 +58,7 @@ class Message:
         typ: str,
         topic: str | None = None,
         conn_id: str | list[str] | None = None
-    ) -> NoReturn:
+    ) -> None:
         self.typ = typ
         self.topic = topic
         self.conn_id = conn_id

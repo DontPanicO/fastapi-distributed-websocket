@@ -202,13 +202,13 @@ Connection objects wrap the websocket connection and provide a simple interface
 to send and receive messages. They have a `topics` attribute to store subscriptions
 patterns and implement pub/sub models.
 
-* **`async`**` accept(self) -> NoReturn` \
+* **`async`**` accept(self) -> None` \
   Accept the connection.
-* **`async`**` close(self, code: int = 1000) -> NoReturn` \
+* **`async`**` close(self, code: int = 1000) -> None` \
   Close the connection with the specified status.
 * **`async`**` receive_json(self) -> Any` \
   Receive a JSON message.
-* **`async`**` send_json(self, data: Any) -> NoReturn` \
+* **`async`**` send_json(self, data: Any) -> None` \
   Send a JSON message over the connection.
 * **`async`**` iter_json(self) -> AsyncIterator[Any]` \
   Iterate over the messages received over the connection.
@@ -248,11 +248,11 @@ This may be confusing, but remember to keep separated the communication between 
 and the clients, that you are developing and the communication between the server and the broker,
 that you usually don't deal with.
 
-* `subscribe(connection: Connection, message: Message) -> NoReturn` \
+* `subscribe(connection: Connection, message: Message) -> None` \
   Subscribe a connection to `message.topic`.
-* `unsubscribe(connection: Connection, message: Message) -> NoReturn` \
+* `unsubscribe(connection: Connection, message: Message) -> None` \
   Unsubscribe a connection from `message.topic`.
-* `hanlde_subscription_message(connection: Connection, message: Message) -> NoReturn` \
+* `hanlde_subscription_message(connection: Connection, message: Message) -> None` \
   Calls `subscribe` or `unsubscribe` depending on the message type.
 * `matches(topic: str, patterns: set[str]) -> bool` \
   Check if `topic` matches any of the patterns in `patterns`.
@@ -284,10 +284,10 @@ your handler function can easily access it.
 If you need to access connection objects from the exception handler, your custom exceptions
 should inherit from `WebSocketException`, no matter if they are really network related or not.
 
-* `WebSocketException(self, message: str, *, connection: Connection) -> NoReturn`
-* `InvalidSubscription(self, message: str, *, connection: Connection) -> NoReturn` \
+* `WebSocketException(self, message: str, *, connection: Connection) -> None`
+* `InvalidSubscription(self, message: str, *, connection: Connection) -> None` \
   Raised when a subscription pattern use an invalid syntax. Inherits from `WebSocketException`.
-* `InvalidSubscriptionMessage(self, message: str, *, connection: Connection) -> NoReturn` \
+* `InvalidSubscriptionMessage(self, message: str, *, connection: Connection) -> None` \
   Like `InvalidSubscription` it could be raised for bad syntax, but it could also be raised \
   when the message type is not *subscribe* or *unsubscribe*. Inherits from `WebSocketException`.
 
@@ -311,15 +311,15 @@ other implementation. `fastapi-distributed-websocket` provides an `InMemoryBroke
 for development purposes.
 You can inherit from `BrokerInterface` and override the methods to implement your own broker.
 
-* **`async`**` connect(self) -> Coroutine[Any, Any, NoReturn]` \
+* **`async`**` connect(self) -> Coroutine[Any, Any, None]` \
   Connect to the broker.
-* **`async`**` disconnect(self) -> Coroutine[Any, Any, NoReturn]` \
+* **`async`**` disconnect(self) -> Coroutine[Any, Any, None]` \
   Disconnect from the broker.
-* **`async`**` subscribe(self, channel: str) -> Coroutine[Any, Any, NoReturn]` \
+* **`async`**` subscribe(self, channel: str) -> Coroutine[Any, Any, None]` \
   Subscribe to a channel.
-* **`async`**` unsubscribe(self, channel: str) -> Coroutine[Any, Any, NoReturn]` \
+* **`async`**` unsubscribe(self, channel: str) -> Coroutine[Any, Any, None]` \
   Unsubscribe from a channel.
-* **`async`**` publish(self, channel: str, message: Any) -> Coroutine[Any, Any, NoReturn]` \
+* **`async`**` publish(self, channel: str, message: Any) -> Coroutine[Any, Any, None]` \
   Publish a message to a channel.
 * **`async`**` get_message(self, **kwargs) -> Coroutine[Any, Any, Message | None]` \
   Get a message from the broker.
@@ -340,33 +340,33 @@ The broker initialisation is done in the constructor while calls to `broker.conn
   Create a new connection object, add it to `self.active_connections` and return it.
 * **`async`**` close_connection(
         self, connection: Connection, code: int = status.WS_1000_NORMAL_CLOSURE
-    ) -> Coroutine[Any, Any, NoReturn]` \
+    ) -> Coroutine[Any, Any, None]` \
   Close a connection object and remove it from `self.active_connections`.
-* ` remove_connection(self, connection: Connection) -> NoReturn` \
+* ` remove_connection(self, connection: Connection) -> None` \
   Remove a connection object from `self.active_connections`.
-* `set_conn_id(self, connection: Connection, conn_id: str) -> NoReturn` \
+* `set_conn_id(self, connection: Connection, conn_id: str) -> None` \
   Set the connection id and notify the client.
-* `send(self, topic: str, message: Any) -> NoReturn` \
+* `send(self, topic: str, message: Any) -> None` \
   Send a message to all the connection objects subscribed to `topic`. \
   It spawns a new task wrapping the coroutine resulting from `self._send`.
-* `broadcast(self, message: Any) -> NoReturn` \
+* `broadcast(self, message: Any) -> None` \
   Send a message to all the connection objects. \
   It spawns a new task wrapping the coroutine resulting from `self._broadcast`.
-* `send_by_conn_id(self, conn_id: str | list[str], message: Any) -> NoReturn` \
+* `send_by_conn_id(self, conn_id: str | list[str], message: Any) -> None` \
   Send a message to all the connection objects with the given connection id. \
   It spawns a new task wrapping the coroutine resulting from `self._send_by_conn_id` \
   if `conn_id` is a string or from `_send_multi_by_conn_id` if it is a list.
-* `send_msg(self, message: Message) -> NoReturn` \
+* `send_msg(self, message: Message) -> None` \
   Based on the message type, it calls `send`, `send_by_conn_id` or `broadcast`.
 * **`async`**` receive(
         self, connection: Connection, message: Any
-    ) -> Coroutine[Any, Any, NoReturn]` \
+    ) -> Coroutine[Any, Any, None]` \
   Receive a message from a connection object. It passes the message down to \
   a private method that handle eventual subscriptions and then publish the message \
   to the broker.
-* **`async`**` startup(self) -> Coroutine[Any, Any, NoReturn]` \
+* **`async`**` startup(self) -> Coroutine[Any, Any, None]` \
   Start the broker connection and the listener task.
-* **`async`**` shutdown(self) -> Coroutine[Any, Any, NoReturn]` \
+* **`async`**` shutdown(self) -> Coroutine[Any, Any, None]` \
   Close the broker connection and the listener task. \
   It also takes care to cancel all the tasks spawned by `send` and `broadcast` and \
   close all the connection objects before.
@@ -383,7 +383,7 @@ It's initialised with a two parameters:
 
 Notice that the target server could be a remote server or the same server that starts the proxy.
 
-* **`async`**` __call__(self) -> Coroutine[Any, Any, NoReturn]` \
+* **`async`**` __call__(self) -> Coroutine[Any, Any, None]` \
   Start a websocket connection to **server_endpoint** and spawn two tasks: \
   one that forwards the messages from the client to the target and the other that \
   forwards the messages from the target to the client.

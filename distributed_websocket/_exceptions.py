@@ -1,4 +1,3 @@
-from typing import NoReturn
 from ._connection import Connection
 
 
@@ -11,7 +10,7 @@ class WebSocketException(BaseException):
     exception handler can use.
     '''
     
-    def __init__(self, message: str, *, connection: Connection) -> NoReturn:
+    def __init__(self, message: str, *, connection: Connection) -> None:
         self.message = message
         self.connection = connection
         super().__init__(message)

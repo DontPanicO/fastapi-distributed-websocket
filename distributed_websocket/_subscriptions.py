@@ -1,4 +1,4 @@
-from typing import Any, NoReturn
+from typing import Any
 
 from ._connection import Connection
 from ._message import Message
@@ -17,7 +17,7 @@ def _check_subscription_message(message: Message) -> bool:
     return is_subscription_message(message) and _is_valid_subscription(message.topic)
 
 
-def subscribe(connection: Connection, message: Message) -> NoReturn:
+def subscribe(connection: Connection, message: Message) -> None:
     if not _check_subscription_message(message):
         raise InvalidSubscriptionMessage(
             f'"{message}" is not a valid subscription message',
@@ -26,7 +26,7 @@ def subscribe(connection: Connection, message: Message) -> NoReturn:
     connection.topics.add(message.topic)
 
 
-def unsubscribe(connection: Connection, message: Message) -> NoReturn:
+def unsubscribe(connection: Connection, message: Message) -> None:
     if not _check_subscription_message(message):
         raise InvalidSubscriptionMessage(
             f'"{message}" is not a valid subscription message',
@@ -36,7 +36,7 @@ def unsubscribe(connection: Connection, message: Message) -> NoReturn:
         connection.topics.remove(message.topic)
 
 
-def handle_subscription_message(connection: Connection, message: Message) -> NoReturn:
+def handle_subscription_message(connection: Connection, message: Message) -> None:
     if message.typ == 'subscribe':
         subscribe(connection, message)
     else:

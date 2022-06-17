@@ -1,10 +1,10 @@
 import inspect
 import asyncio
 import json
-from typing import Any, NoReturn
+from typing import Any
 
 
-def clear_task(task: asyncio.Task) -> NoReturn:
+def clear_task(task: asyncio.Task) -> None:
     if task.done():
         task.result()
     else:

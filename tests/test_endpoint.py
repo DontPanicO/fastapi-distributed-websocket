@@ -9,7 +9,7 @@ import pytest
 # @pytest.mark.asyncio
 # async def test_endpoint(
 #     session: aiohttp.ClientSession, event_loop: asyncio.AbstractEventLoop
-# ) -> Coroutine[None, None, typing.NoReturn]:
+# ) -> Coroutine[None, None, typing.None]:
 #     async with session.ws_connect('/ws/broadcast/myid') as ws:
 #         await ws.send_json({'message': 'hello'})
 #         message = await ws.receive_json()
@@ -19,7 +19,7 @@ import pytest
 @pytest.mark.asyncio
 async def test_authenticated_endpoint(
     session: aiohttp.ClientSession, event_loop: asyncio.AbstractEventLoop
-) -> Coroutine[None, None, typing.NoReturn]:
+) -> Coroutine[None, None, None]:
     raw_rsp = await session.post(
         'http://testapp:8000/token',
         data={'username': 'johndoe', 'password': 'secret'},

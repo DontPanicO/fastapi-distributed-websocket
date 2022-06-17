@@ -1,4 +1,4 @@
-from typing import Optional, Any, NoReturn
+from typing import Optional, Any
 from collections.abc import AsyncIterator, Awaitable, Coroutine
 
 from fastapi import (
@@ -63,12 +63,12 @@ async def get_current_user(
 
 
 @app.on_event('startup')
-async def startup() -> Coroutine[Any, Any, NoReturn]:
+async def startup() -> Coroutine[Any, Any, None]:
     await manager.startup()
 
 
 @app.on_event('shutdown')
-async def shutdown() -> Coroutine[Any, Any, NoReturn]:
+async def shutdown() -> Coroutine[Any, Any, None]:
     await manager.shutdown()
 
 
@@ -83,7 +83,7 @@ def token(data: OAuth2PasswordRequestForm = Depends()) -> Any:
 @app.websocket('/ws/broadcast/{conn_id}')
 async def websocket_broadcast_endpoint(
     websocket: WebSocket, conn_id: str
-) -> Coroutine[Any, Any, NoReturn]:
+) -> Coroutine[Any, Any, None]:
     connection = await manager.new_connection(websocket, conn_id)
     async for message in connection.iter_json():
         await connection.send_json(message)
@@ -93,7 +93,7 @@ async def websocket_broadcast_endpoint(
 @app.websocket('/ws/{conn_id}')
 async def websocket_receive_endpoint(
     websocket: WebSocket, conn_id: str, user: Optional[Any] = Depends(get_current_user)
-) -> Coroutine[Any, Any, NoReturn]:
+) -> Coroutine[Any, Any, None]:
     connection = await manager.new_connection(websocket, conn_id)
     async for message in connection.iter_json():
         await manager.receive(connection, message)
