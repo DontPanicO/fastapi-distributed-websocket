@@ -51,6 +51,7 @@ setup(
     install_requires=[
         'redis>=4.3.1',
         'fastapi>=0.75.2',
+        'websockets==10.3',
     ],
     package_data={'distributed_websocket': ['py.typed']},
     python_requires='>=3.10',
