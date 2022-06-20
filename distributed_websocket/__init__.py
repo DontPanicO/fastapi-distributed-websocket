@@ -1,6 +1,9 @@
 from ._auth import WebSocketOAuth2PasswordBearer
 from ._connection import Connection
 from ._broker import InMemoryBroker, RedisBroker
+from ._decorators import handle, ahandle
+from ._matching import matches
+from ._subscriptions import subscribe, unsubscribe, handle_subscription_message
 from ._types import BrokerT
 from .manager import WebSocketManager
 from .proxy import WebSocketProxy
@@ -15,6 +18,12 @@ __all__ = [
     'InMemoryBroker',
     'RedisBroker',
     'BrokerT',
+    'handle',
+    'ahandle',
+    'matches',
+    'subscribe',
+    'unsubscribe',
+    'handle_subscription_message',
     'is_valid_broker',
 ]
 
