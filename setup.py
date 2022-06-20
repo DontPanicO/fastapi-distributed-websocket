@@ -36,7 +36,7 @@ classifiers = [
 
 
 setup(
-    name='distributed_websocket',
+    name='fastapi-distributed-websocket',
     version=read_version(),
     author='Andrea Tedeschi',
     author_email='andrea.tedeschi@andreatedeschi.uno',
