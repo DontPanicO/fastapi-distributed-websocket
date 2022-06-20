@@ -9,6 +9,7 @@ from .utils import is_valid_broker
 
 __all__ = [
     'WebSocketManager',
+    'WebSocketProxy',
     'WebSocketOAuth2PasswordBearer',
     'Connection',
     'InMemoryBroker',
