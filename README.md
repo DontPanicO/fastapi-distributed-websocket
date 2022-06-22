@@ -23,7 +23,7 @@ The main features of this libarary are:
 ## Problems of scaling websocket among multiple servers in production
 
 Websocket is a relatively new protocol for real time communication over HTTP.
-It establishes a druable, stateful, full-duplex connection between clients and the server.
+It establishes a durable, stateful, full-duplex connection between clients and the server.
 It can be used to implement chats, real time notifications, broadcasting and
 pub/sub models.
 
