@@ -10,7 +10,7 @@ async def _await_maybe(result: Any) -> Coroutine[Any, Any, Any]:
     return result
 
 
-def handle(exc: BaseException, handler: Callable[..., Any]) -> Callable[..., Any]:
+def handle(exc: type[BaseException], handler: Callable[..., Any]) -> Callable[..., Any]:
     def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         @wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
@@ -25,7 +25,7 @@ def handle(exc: BaseException, handler: Callable[..., Any]) -> Callable[..., Any
 
 
 def ahandle(
-    exc: BaseException, handler: Callable[..., Coroutine[Any, Any, Any]]
+    exc: type[BaseException], handler: Callable[..., Coroutine[Any, Any, Any]]
 ) -> Callable[..., Any]:
     def decorator(func: Callable[..., Any]) -> Callable[..., Coroutine[Any, Any, Any]]:
         @wraps(func)
