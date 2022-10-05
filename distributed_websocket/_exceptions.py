@@ -1,3 +1,9 @@
+__all__ = (
+    'WebSocketException',
+    'InvalidSubscription',
+    'InvalidSubscriptionMessage',
+)
+
 from ._connection import Connection
 
 
@@ -9,7 +15,7 @@ class WebSocketException(BaseException):
     keeping a reference to the connection object that the
     exception handler can use.
     '''
-    
+
     def __init__(self, message: str, *, connection: Connection) -> None:
         self.message = message
         self.connection = connection
@@ -20,6 +26,7 @@ class InvalidSubscription(WebSocketException):
     '''
     Raised when a subscription pattern is invalid.
     '''
+
     ...
 
 
@@ -29,4 +36,5 @@ class InvalidSubscriptionMessage(WebSocketException):
     Differs from `InvalidSubscription` in that it also
     checks the validity of the message type.
     '''
+
     ...

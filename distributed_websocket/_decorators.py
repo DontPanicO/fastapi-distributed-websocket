@@ -1,16 +1,24 @@
+__all__ = ('handle', 'ahandle')
+
 import inspect
-from typing import Any
+from typing import Any, TypeVar
 from collections.abc import Coroutine, Callable
 from functools import wraps
 
 
-async def _await_maybe(result: Any) -> Coroutine[Any, Any, Any]:
+T = TypeVar('T')
+E = TypeVar('E', bound=BaseException)
+
+
+async def _await_maybe(result: T | Coroutine[Any, Any, T]) -> T:
     if inspect.isawaitable(result):
         return await result
     return result
 
 
-def handle(exc: type[BaseException], handler: Callable[..., Any]) -> Callable[..., Any]:
+def handle(
+    exc: type[E], handler: Callable[[E], Any]
+) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
     def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         @wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
@@ -25,8 +33,8 @@ def handle(exc: type[BaseException], handler: Callable[..., Any]) -> Callable[..
 
 
 def ahandle(
-    exc: type[BaseException], handler: Callable[..., Coroutine[Any, Any, Any]]
-) -> Callable[..., Any]:
+    exc: type[E], handler: Callable[[E], Coroutine[Any, Any, Any]]
+) -> Callable[[Callable[..., Any]], Callable[..., Coroutine[Any, Any, Any]]]:
     def decorator(func: Callable[..., Any]) -> Callable[..., Coroutine[Any, Any, Any]]:
         @wraps(func)
         async def wrapper(*args: Any, **kwargs: Any) -> Any:

@@ -1,5 +1,4 @@
-import re
-from collections.abc import Generator
+__all__ = ('matches',)
 
 
 def _match_topic_with_wildcards(topic: str, pattern: str) -> bool:

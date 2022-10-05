@@ -1,3 +1,10 @@
+__all__ = (
+    'tag_client_message',
+    'validate_incoming_message',
+    'untag_broker_message',
+    'Message',
+)
+
 import json
 from typing import Any
 
@@ -57,7 +64,7 @@ class Message:
         data: Any,
         typ: str,
         topic: str | None = None,
-        conn_id: str | list[str] | None = None
+        conn_id: str | list[str] | None = None,
     ) -> None:
         self.typ = typ
         self.topic = topic
@@ -65,7 +72,7 @@ class Message:
         self.data = data
 
     @classmethod
-    def from_client_message(cls, *, data: Any) -> 'Message':
+    def from_client_message(cls, *, data: dict) -> 'Message':
         return cls(
             data=data,
             typ=data.get('type'),

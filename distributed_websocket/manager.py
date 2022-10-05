@@ -1,6 +1,5 @@
 import asyncio
 from typing import Iterator, Any
-from collections.abc import Coroutine
 
 from fastapi import WebSocket, status
 
@@ -39,19 +38,17 @@ class WebSocketManager:
         self.broker: BrokerT | None = _init_broker(broker_url, broker_class, **kwargs)
         self.broker_channel: str = broker_channel
 
-    async def __aenter__(self) -> Coroutine[Any, Any, 'WebSocketManager']:
+    async def __aenter__(self) -> 'WebSocketManager':
         await self.startup()
         return self
 
-    async def __aexit__(
-        self, exc_type, exc_val, exc_tb
-    ) -> Coroutine[Any, Any, None]:
+    async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
         await self.shutdown()
 
     def __iter__(self) -> Iterator:
         return self.active_connections.__iter__()
 
-    async def _connect(self, connection: Connection) -> Coroutine[Any, Any, None]:
+    async def _connect(self, connection: Connection) -> None:
         await connection.accept()
         self.active_connections.append(connection)
 
@@ -60,14 +57,14 @@ class WebSocketManager:
 
     async def new_connection(
         self, websocket: WebSocket, conn_id: str, topic: str | None = None
-    ) -> Coroutine[Any, Any, Connection]:
+    ) -> Connection:
         connection = Connection(websocket, conn_id, topic)
         await self._connect(connection)
         return connection
 
     async def close_connection(
         self, connection: Connection, code: int = status.WS_1000_NORMAL_CLOSURE
-    ) -> Coroutine[Any, Any, None]:
+    ) -> None:
         await connection.close(code)
         self._disconnect(connection)
 
@@ -79,10 +76,8 @@ class WebSocketManager:
         '''
         self._disconnect(connection)
 
-    async def _set_conn_id(
-        self, connection: Connection, conn_id: str
-    ) -> Coroutine[Any, Any, None]:
-        connection.conn_id = conn_id
+    async def _set_conn_id(self, connection: Connection, conn_id: str) -> None:
+        connection.id = conn_id
         await connection.send_json({'type': 'set_conn_id', 'conn_id': conn_id})
 
     def set_conn_id(self, connection: Connection, conn_id: str) -> None:
@@ -90,7 +85,7 @@ class WebSocketManager:
             asyncio.create_task(self._set_conn_id(connection, conn_id))
         )
 
-    async def _send(self, topic: str, message: Any) -> Coroutine[Any, Any, None]:
+    async def _send(self, topic: str, message: Any) -> None:
         for connection in self.active_connections:
             if matches(topic, connection.topics):
                 await connection.send_json(message)
@@ -98,24 +93,20 @@ class WebSocketManager:
     def send(self, topic: str, message: Any) -> None:
         self._send_tasks.append(asyncio.create_task(self._send(topic, message)))
 
-    async def _broadcast(self, message: Any) -> Coroutine[Any, Any, None]:
+    async def _broadcast(self, message: Any) -> None:
         for connection in self.active_connections:
             await connection.send_json(message)
 
     def broadcast(self, message: Any) -> None:
         self._send_tasks.append(asyncio.create_task(self._broadcast(message)))
 
-    async def _send_by_conn_id(
-        self, conn_id: str, message: Any
-    ) -> Coroutine[Any, Any, None]:
+    async def _send_by_conn_id(self, conn_id: str, message: Any) -> None:
         for connection in self.active_connections:
             if connection.id == conn_id:
                 await connection.send_json(message)
                 break
 
-    async def _send_multi_by_conn_id(
-        self, conn_ids: list[str], message: Any
-    ) -> Coroutine[Any, Any, None]:
+    async def _send_multi_by_conn_id(self, conn_ids: list[str], message: Any) -> None:
         for connection in self.active_connections:
             if connection.id in conn_ids:
                 await connection.send_json(message)
@@ -144,41 +135,39 @@ class WebSocketManager:
         else:
             self.send(message.topic, message.data)
 
-    async def _publish_to_broker(self, message: Any) -> Coroutine[Any, Any, None]:
+    async def _publish_to_broker(self, message: Any) -> None:
         await self.broker.publish(self.broker_channel, message)
 
     async def _handle_client_message(
         self, connection: Connection, message: Message
-    ) -> Coroutine[Any, Any, None]:
+    ) -> None:
         if is_subscription_message(message):
             handle_subscription_message(connection, message)
         else:
             await self._publish_to_broker(serialize(message))
 
     @ahandle(WebSocketException, send_error_message)
-    async def receive(
-        self, connection: Connection, message: Any
-    ) -> Coroutine[Any, Any, None]:
+    async def receive(self, connection: Connection, message: Any) -> None:
         validate_incoming_message(message)
         await self._handle_client_message(
             connection, Message.from_client_message(data=message)
         )
 
-    async def _next_broker_message(self) -> Coroutine[Any, Any, Message]:
+    async def _next_broker_message(self) -> Message:
         return await self.broker.get_message()
 
-    async def _broker_listener(self) -> Coroutine[Any, Any, None]:
+    async def _broker_listener(self) -> None:
         while True:
             message = await self._next_broker_message()
             if message is not None:
                 self.send_msg(message)
 
-    async def startup(self) -> Coroutine[Any, Any, None]:
+    async def startup(self) -> None:
         await self.broker.connect()
         await self.broker.subscribe(self.broker_channel)
         self._main_task = asyncio.create_task(self._broker_listener())
 
-    async def shutdown(self) -> Coroutine[Any, Any, None]:
+    async def shutdown(self) -> None:
         for task in self._send_tasks:
             clear_task(task)
         for connection in self.active_connections:

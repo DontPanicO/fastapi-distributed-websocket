@@ -2,7 +2,6 @@ __all__ = ['WebSocketProxy']
 
 import asyncio
 from typing import Any
-from collections.abc import Coroutine
 
 import websockets
 from fastapi import WebSocket, WebSocketDisconnect
@@ -10,14 +9,14 @@ from fastapi import WebSocket, WebSocketDisconnect
 
 async def _forward(
     client: WebSocket, target: websockets.WebSocketClientProtocol
-) -> Coroutine[Any, Any, None]:
+) -> None:
     async for message in client.iter_text():
         await target.send(message)
 
 
 async def _reverse(
     client: WebSocket, target: websockets.WebSocketClientProtocol
-) -> Coroutine[Any, Any, None]:
+) -> None:
     async for message in target:
         await client.send_text(message)
 
@@ -29,7 +28,7 @@ class WebSocketProxy:
         self._forward_task: asyncio.Task | None = None
         self._reverse_task: asyncio.Task | None = None
 
-    async def __call__(self) -> Coroutine[Any, Any, None]:
+    async def __call__(self) -> None:
         async with websockets.connect(self._server_endpoint) as target:
             self._forward_task = asyncio.create_task(_forward(self._client, target))
             self._reverse_task = asyncio.create_task(_reverse(self._client, target))

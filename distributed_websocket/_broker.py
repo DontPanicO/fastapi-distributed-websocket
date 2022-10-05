@@ -1,8 +1,8 @@
+__all__ = ('BrokerInterface', 'create_broker')
 import asyncio
 import json
 from abc import ABC, abstractmethod
 from typing import Any
-from collections.abc import Coroutine
 from urllib.parse import urlparse
 
 from redis.asyncio import Redis
@@ -13,29 +13,27 @@ from ._message import Message, untag_broker_message
 
 class BrokerInterface(ABC):
     @abstractmethod
-    async def connect(self) -> Coroutine[Any, Any, None]:
+    async def connect(self) -> None:
         ...
 
     @abstractmethod
-    async def disconnect(self) -> Coroutine[Any, Any, None]:
+    async def disconnect(self) -> None:
         ...
 
     @abstractmethod
-    async def subscribe(self, channel: str) -> Coroutine[Any, Any, None]:
+    async def subscribe(self, channel: str) -> None:
         ...
 
     @abstractmethod
-    async def unsubscribe(self, channel: str) -> Coroutine[Any, Any, None]:
+    async def unsubscribe(self, channel: str) -> None:
         ...
 
     @abstractmethod
-    async def publish(
-        self, channel: str, message: Any
-    ) -> Coroutine[Any, Any, None]:
+    async def publish(self, channel: str, message: Any) -> None:
         ...
 
     @abstractmethod
-    async def get_message(self, **kwargs) -> Coroutine[Any, Any, Message | None]:
+    async def get_message(self, **kwargs) -> Message | None:
         ...
 
 
@@ -44,32 +42,28 @@ class InMemoryBroker(BrokerInterface):
         self._subscribers: set = set()
         self._messages: asyncio.Queue = asyncio.Queue()
 
-    async def __aenter__(self) -> Coroutine[Any, Any, BrokerInterface]:
+    async def __aenter__(self) -> BrokerInterface:
         return self
 
-    async def __aexit__(
-        self, exc_type, exc_val, exc_tb
-    ) -> Coroutine[Any, Any, None]:
+    async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
         pass
 
-    async def connect(self) -> Coroutine[Any, Any, None]:
+    async def connect(self) -> None:
         pass
 
-    async def disconnect(self) -> Coroutine[Any, Any, None]:
+    async def disconnect(self) -> None:
         pass
 
-    async def subscribe(self, channel: str) -> Coroutine[Any, Any, None]:
+    async def subscribe(self, channel: str) -> None:
         self._subscribers.add(channel)
 
-    async def unsubscribe(self, channel: str) -> Coroutine[Any, Any, None]:
+    async def unsubscribe(self, channel: str) -> None:
         self._subscribers.remove(channel)
 
-    async def publish(
-        self, channel: str, message: Any
-    ) -> Coroutine[Any, Any, None]:
+    async def publish(self, channel: str, message: Any) -> None:
         await self._messages.put({'channel': channel, 'data': message})
 
-    async def get_message(self, **kwargs) -> Coroutine[Any, Any, Message | None]:
+    async def get_message(self, **kwargs) -> Message | None:
         message = await self._messages.get()
         if self.has_subscribers(message['channel']):
             typ, topic, conn_id, data = untag_broker_message(message['data'])
@@ -87,33 +81,31 @@ class RedisBroker(BrokerInterface):
         self._redis: Redis = Redis.from_url(redis_url)
         self._pubsub: PubSub = self._redis.pubsub()
 
-    async def __aenter__(self) -> Coroutine[Any, Any, BrokerInterface]:
+    async def __aenter__(self) -> BrokerInterface:
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
         await self.disconnect()
 
-    async def connect(self) -> Coroutine[Any, Any, None]:
+    async def connect(self) -> None:
         pass
 
-    async def disconnect(self) -> Coroutine[Any, Any, None]:
+    async def disconnect(self) -> None:
         await self._pubsub.reset()
         await self._redis.close()
 
-    async def subscribe(self, channel: str) -> Coroutine[Any, Any, None]:
+    async def subscribe(self, channel: str) -> None:
         await self._pubsub.subscribe(channel)
 
-    async def unsubscribe(self, channel: str) -> Coroutine[Any, Any, None]:
+    async def unsubscribe(self, channel: str) -> None:
         await self._pubsub.unsubscribe(channel)
 
-    async def publish(
-        self, channel: str, message: Any
-    ) -> Coroutine[Any, Any, None]:
+    async def publish(self, channel: str, message: Any) -> None:
         if isinstance(message, dict):
             message = json.dumps(message)
         await self._redis.publish(channel, message)
 
-    async def get_message(self, **kwargs) -> Coroutine[Any, Any, Message | None]:
+    async def get_message(self, **kwargs) -> Message | None:
         message = await self._pubsub.get_message(ignore_subscribe_messages=True)
         if message:
             typ, topic, conn_id, data = untag_broker_message(message['data'])

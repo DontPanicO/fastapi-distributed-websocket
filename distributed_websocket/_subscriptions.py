@@ -1,3 +1,10 @@
+__all__ = (
+    'is_subscription_message',
+    'subscribe',
+    'unsubscribe',
+    'handle_subscription_message',
+)
+
 from typing import Any
 
 from ._connection import Connection
@@ -20,8 +27,7 @@ def _check_subscription_message(message: Message) -> bool:
 def subscribe(connection: Connection, message: Message) -> None:
     if not _check_subscription_message(message):
         raise InvalidSubscriptionMessage(
-            f'"{message}" is not a valid subscription message',
-            connection=connection
+            f'"{message}" is not a valid subscription message', connection=connection
         )
     connection.topics.add(message.topic)
 
@@ -29,8 +35,7 @@ def subscribe(connection: Connection, message: Message) -> None:
 def unsubscribe(connection: Connection, message: Message) -> None:
     if not _check_subscription_message(message):
         raise InvalidSubscriptionMessage(
-            f'"{message}" is not a valid subscription message',
-            connection=connection
+            f'"{message}" is not a valid subscription message', connection=connection
         )
     if message.topic in connection.topics:
         connection.topics.remove(message.topic)

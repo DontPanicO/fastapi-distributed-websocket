@@ -1,3 +1,5 @@
+__all__ = ('Connection',)
+
 from typing import Any, Callable
 from collections.abc import AsyncIterator, Coroutine
 
@@ -25,7 +27,5 @@ class Connection:
     async def __aiter__(self) -> AsyncIterator:
         return self.iter_json()
 
-    async def close(
-        self, code: int = status.WS_1000_NORMAL_CLOSURE
-    ) -> Coroutine[Any, Any, None]:
+    async def close(self, code: int = status.WS_1000_NORMAL_CLOSURE) -> None:
         await self.websocket.close(code)

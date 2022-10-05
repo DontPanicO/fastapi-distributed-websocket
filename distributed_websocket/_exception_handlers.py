@@ -1,9 +1,7 @@
-from typing import Any
-from collections.abc import Coroutine
+__all__ = ('send_error_message',)
 
-from ._connection import Connection
 from ._exceptions import WebSocketException
 
 
-async def send_error_message(exc: WebSocketException) -> Coroutine[Any, Any, None]:
+async def send_error_message(exc: WebSocketException) -> None:
     await exc.connection.send_json({'error': exc.message})
