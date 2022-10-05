@@ -4,6 +4,7 @@ __all__ = (
     'serialize',
     'deserialize',
     'update',
+    'get_send_params',
     'is_valid_broker',
 )
 
@@ -11,6 +12,8 @@ import inspect
 import asyncio
 import json
 from typing import Any
+
+from ._message import Message
 
 
 def clear_task(task: asyncio.Task) -> None:
@@ -42,6 +45,12 @@ def update(obj: dict, **kwargs) -> dict:
     new_obj = obj.copy()
     new_obj.update(**kwargs)
     return new_obj
+
+
+def get_send_params(
+    message: Message, *, topic: str | None = None, data: dict | None = None
+) -> tuple[str, dict]:
+    return topic or message.topic, data or message.data
 
 
 def is_valid_broker(obj: Any) -> bool:
