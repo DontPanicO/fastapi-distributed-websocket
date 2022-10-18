@@ -6,7 +6,7 @@ services:
     image: redis:6.2-alpine
 
   testapp:
-    build: .
+    # build: .
     image: testapp
     depends_on:
       - redis

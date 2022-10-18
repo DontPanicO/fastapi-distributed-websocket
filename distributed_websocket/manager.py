@@ -1,5 +1,6 @@
 import asyncio
-from typing import Iterator, Any
+from typing import Any, TypeVar
+from collections.abc import Callable, Coroutine, Iterator
 
 from fastapi import WebSocket, status
 
@@ -13,6 +14,9 @@ from ._subscriptions import is_subscription_message, handle_subscription_message
 from ._exception_handlers import send_error_message
 from ._decorators import ahandle
 from ._exceptions import WebSocketException
+
+
+T = TypeVar('T')
 
 
 def _init_broker(url: str, broker_class: Any | None = None, **kwargs) -> BrokerT:
@@ -85,55 +89,47 @@ class WebSocketManager:
             asyncio.create_task(self._set_conn_id(connection, conn_id))
         )
 
-    async def _send(self, topic: str, message: Any) -> None:
+    async def _send(self, message: Message) -> None:
         for connection in self.active_connections:
-            if matches(topic, connection.topics):
-                await connection.send_json(message)
+            if matches(message.topic, connection.topics):
+                await connection.send_json(message.data)
 
-    def send(self, topic: str, message: Any) -> None:
-        self._send_tasks.append(asyncio.create_task(self._send(topic, message)))
+    def send(self, message: Message) -> None:
+        self._send_tasks.append(asyncio.create_task(self._send(message)))
 
-    async def _broadcast(self, message: Any) -> None:
+    async def _broadcast(self, message: Message) -> None:
         for connection in self.active_connections:
-            await connection.send_json(message)
+            await connection.send_json(message.data)
 
-    def broadcast(self, message: Any) -> None:
+    def broadcast(self, message: Message) -> None:
         self._send_tasks.append(asyncio.create_task(self._broadcast(message)))
 
-    async def _send_by_conn_id(self, conn_id: str, message: Any) -> None:
+    async def _send_by_conn_id(self, message: Message) -> None:
         for connection in self.active_connections:
-            if connection.id == conn_id:
-                await connection.send_json(message)
+            if connection.id == message.conn_id:
+                await connection.send_json(message.data)
                 break
 
-    async def _send_multi_by_conn_id(self, conn_ids: list[str], message: Any) -> None:
+    async def _send_multi_by_conn_id(self, message: Message) -> None:
         for connection in self.active_connections:
-            if connection.id in conn_ids:
-                await connection.send_json(message)
+            if connection.id in message.conn_id:
+                await connection.send_json(message.data)
 
-    def send_by_conn_id(self, conn_id: str | list[str], message: Any) -> None:
-        if isinstance(conn_id, list):
+    def send_by_conn_id(self, message: Message) -> None:
+        if isinstance(message.conn_id, list):
             self._send_tasks.append(
-                asyncio.create_task(self._send_multi_by_conn_id(conn_id, message))
+                asyncio.create_task(self._send_multi_by_conn_id(message))
             )
         else:
-            self._send_tasks.append(
-                asyncio.create_task(self._send_by_conn_id(conn_id, message))
-            )
+            self._send_tasks.append(asyncio.create_task(self._send_by_conn_id(message)))
 
-    def send_multi_by_conn_id(self, conn_ids: list[str], message: Any) -> None:
-        # to be removed
-        self._send_tasks.append(
-            asyncio.create_task(self._send_multi_by_conn_id(conn_ids, message))
-        )
+    def _get_outgoing_message_handler(
+        self, message: Message
+    ) -> Callable[[Message], T | Coroutine[Any, Any, T]]:
+        return getattr(self, message.typ, self.send)
 
     def send_msg(self, message: Message) -> None:
-        if message.typ == 'broadcast':
-            self.broadcast(message.data)
-        elif message.typ == 'send_by_conn_id':
-            self.send_by_conn_id(message.conn_id, message.data)
-        else:
-            self.send(message.topic, message.data)
+        self._get_outgoing_message_handler(message)(message)
 
     async def _publish_to_broker(self, message: Any) -> None:
         await self.broker.publish(self.broker_channel, message)
