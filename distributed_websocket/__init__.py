@@ -5,6 +5,7 @@ from ._decorators import handle, ahandle
 from ._matching import matches
 from ._subscriptions import subscribe, unsubscribe, handle_subscription_message
 from ._types import BrokerT
+from ._message import Message
 from .manager import WebSocketManager
 from .proxy import WebSocketProxy
 from .utils import is_valid_broker
@@ -20,6 +21,7 @@ __all__ = (
     'RedisBroker',
     'create_broker',
     'BrokerT',
+    'Message',
     'handle',
     'ahandle',
     'matches',
