@@ -2,6 +2,11 @@ from ._auth import WebSocketOAuth2PasswordBearer
 from ._connection import Connection
 from ._broker import BrokerInterface, InMemoryBroker, RedisBroker, create_broker
 from ._decorators import handle, ahandle
+from ._exceptions import (
+    WebSocketException,
+    InvalidSubscription,
+    InvalidSubscriptionMessage,
+)
 from ._matching import matches
 from ._subscriptions import subscribe, unsubscribe, handle_subscription_message
 from ._types import BrokerT
@@ -24,6 +29,9 @@ __all__ = (
     'Message',
     'handle',
     'ahandle',
+    'WebSocketException',
+    'InvalidSubscription',
+    'InvalidSubscriptionMessage',
     'matches',
     'subscribe',
     'unsubscribe',
