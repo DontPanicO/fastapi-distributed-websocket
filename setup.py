@@ -11,7 +11,9 @@ def read(*parts):
 
 def read_version():
     regexp = re.compile(r'^__version__\W*=\W*\'([\d.abrc]+)\'')
-    init_py = os.path.join(os.path.dirname(__file__), 'distributed_websocket', '__init__.py')
+    init_py = os.path.join(
+        os.path.dirname(__file__), 'distributed_websocket', '__init__.py'
+    )
     with open(init_py) as f:
         for line in f:
             match = regexp.match(line)
@@ -24,6 +26,7 @@ classifiers = [
     'Development Status :: 3 - Alpha',
     'Programming Language :: Python',
     'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
     'Programming Language :: Python :: 3 :: Only',
     'License :: OSI Approved :: MIT License',
     'Operating System :: POSIX',

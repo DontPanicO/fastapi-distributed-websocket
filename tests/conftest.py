@@ -2,6 +2,7 @@ import asyncio
 from collections.abc import AsyncGenerator, Generator
 
 import pytest
+import pytest_asyncio
 import aiohttp
 from fastapi import FastAPI
 
@@ -15,7 +16,7 @@ def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
     loop.close()
 
 
-@pytest.fixture
+@pytest_asyncio.fixture(scope='session')
 async def session() -> AsyncGenerator[aiohttp.ClientSession, None]:
     async with aiohttp.ClientSession() as session:
         yield session
