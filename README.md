@@ -1,6 +1,6 @@
-[![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/) 
+[![Python 3.11](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/) 
 [![License: MIT](https://img.shields.io/badge/License-MIT-success.svg)](https://mit-license.org/) 
-[![pypi 0.1.0](https://img.shields.io/badge/pypi-0.1.0-ff69b4.svg)](https://pypi.org/project/fastapi-distributed-websocket/)
+[![pypi 0.2.0](https://img.shields.io/badge/pypi-0.1.0-ff69b4.svg)](https://pypi.org/project/fastapi-distributed-websocket/)
 
 # FastAPI Distributed Websocket
 
@@ -354,14 +354,14 @@ The broker initialisation is done in the constructor while calls to `broker.conn
   Remove a connection object from `self.active_connections`.
 * `set_conn_id(self, connection: Connection, conn_id: str) -> None` \
   Set the connection id and notify the client.
-* `send(self, topic: str, message: Any) -> None` \
-  Send a message to all the connection objects subscribed to `topic`. \
+* `send(self, message: Message) -> None` \
+  Send a message to all the connection objects subscribed to `message.topic`. \
   It spawns a new task wrapping the coroutine resulting from `self._send`.
-* `broadcast(self, message: Any) -> None` \
+* `broadcast(self, message: Message) -> None` \
   Send a message to all the connection objects. \
   It spawns a new task wrapping the coroutine resulting from `self._broadcast`.
-* `send_by_conn_id(self, conn_id: str | list[str], message: Any) -> None` \
-  Send a message to all the connection objects with the given connection id. \
+* `send_by_conn_id(self, message: Message) -> None` \
+  Send a message to all the connection objects with `id` equals to `message.conn_id`. \
   It spawns a new task wrapping the coroutine resulting from `self._send_by_conn_id` \
   if `conn_id` is a string or from `_send_multi_by_conn_id` if it is a list.
 * `send_msg(self, message: Message) -> None` \
@@ -376,7 +376,7 @@ The broker initialisation is done in the constructor while calls to `broker.conn
   Start the broker connection and the listener task.
 * **`async`**` shutdown(self) -> Coroutine[Any, Any, None]` \
   Close the broker connection and the listener task. \
-  It also takes care to cancel all the tasks spawned by `send` and `broadcast` and \
+  It also takes care to cancel all the tasks spawned by `send_msg` and \
   close all the connection objects before.
 
 
