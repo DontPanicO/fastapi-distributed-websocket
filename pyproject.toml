@@ -31,14 +31,14 @@ dependencies = [
     "redis>=4.3.1",
     "fastapi>=0.75.2",
     "websockets>=10.3",
-],
+]
 
 [project.urls]
 homepage = "https://github.com/DontPanicO/fastapi-distributed-websocket"
 
 [tool.setuptools]
 platforms = ["POSIX"]
-package_data = { "distributed_websocket": ["py.typed"] }
+package-data = { "distributed_websocket" = ["py.typed"] }
 
 [tool.setuptools.packages.find]
 exclude = ["tests"]
