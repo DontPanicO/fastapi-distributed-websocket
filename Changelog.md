@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - `WebSocketManager._send_by_conn_id`
     - `WebSocketManager._send_multi_by_conn_id`
     - `WebSocketManager.send_by_conn_id`
+- Updated *Python* to `3.11` and tested with latest dependencies versions.
 
 ### Removed
 - ***Breaking change***: removed `WebSocketManager.send_multi_by_conn_id` method.
