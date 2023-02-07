@@ -1,3 +1,44 @@
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "fastapi-distributed-websocket"
+version = "0.2.0"
+authors = [
+  { name="Andrea Tedeschi", email="andrea.tedeschi@andreatedeschi.uno" },
+]
+description = "Large scale WebSocket with FastAPI"
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3 :: Only",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Libraries",
+    "Framework :: AsyncIO",
+    "Framework :: FastAPI",
+]
+license = {file = "LICENSE"}
+keywords = ["asyncio", "fastapi", "websocket", "distributed", "pubsub"]
+dependencies = [
+    "redis>=4.3.1",
+    "fastapi>=0.75.2",
+    "websockets>=10.3",
+],
+
+[project.urls]
+homepage = "https://github.com/DontPanicO/fastapi-distributed-websocket"
+
+[tool.setuptools]
+platforms = ["POSIX"]
+package_data = { "distributed_websocket": ["py.typed"] }
+
+[tool.setuptools.packages.find]
+exclude = ["tests"]
