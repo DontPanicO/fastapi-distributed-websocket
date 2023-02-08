@@ -1,6 +1,6 @@
-[![Python 3.11](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/) 
+[![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/) 
 [![License: MIT](https://img.shields.io/badge/License-MIT-success.svg)](https://mit-license.org/) 
-[![pypi 0.2.0](https://img.shields.io/badge/pypi-0.1.0-ff69b4.svg)](https://pypi.org/project/fastapi-distributed-websocket/)
+[![pypi 0.2.0](https://img.shields.io/badge/pypi-0.2.0-ff69b4.svg)](https://pypi.org/project/fastapi-distributed-websocket/)
 
 # FastAPI Distributed Websocket
 
