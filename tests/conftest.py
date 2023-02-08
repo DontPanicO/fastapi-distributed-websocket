@@ -1,12 +1,10 @@
 import asyncio
+import functools
 from collections.abc import AsyncGenerator, Generator
 
+import anyio
 import pytest
-import pytest_asyncio
-import aiohttp
-from fastapi import FastAPI
-
-from .app import app
+from starlette.testclient import TestClient
 
 
 @pytest.fixture(scope='session')
@@ -16,7 +14,12 @@ def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
     loop.close()
 
 
-@pytest_asyncio.fixture(scope='session')
-async def session() -> AsyncGenerator[aiohttp.ClientSession, None]:
-    async with aiohttp.ClientSession() as session:
-        yield session
+@pytest.fixture
+def test_client_factory(anyio_backend_options):
+    # anyio_backend_name defined by:
+    # https://anyio.readthedocs.io/en/stable/testing.html#specifying-the-backends-to-run-on
+    return functools.partial(
+        TestClient,
+        backend='asyncio',
+        backend_options=anyio_backend_options,
+    )
