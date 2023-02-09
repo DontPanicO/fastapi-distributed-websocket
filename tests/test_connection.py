@@ -22,3 +22,20 @@ def test_connection_send(
     with client.websocket_connect('/') as websocket:
         data = websocket.receive_json()
         assert data == {'your_id': 'test'}
+
+
+def test_connection_iter(
+    test_client_factory: Callable[[Callable[[Scope, Receive, Send], None]], TestClient]
+) -> None:
+    async def app(scope: Scope, receive: Receive, send: Send) -> None:
+        websocket = WebSocket(scope, receive=receive, send=send)
+        await websocket.accept()
+        connection = Connection(websocket, 'test')
+        async for data in connection.iter_json():
+            await connection.send_json({'your_id': connection.id, 'msg': data})
+
+    client = test_client_factory(app)
+    with client.websocket_connect('/') as websocket:
+        websocket.send_json({'msg': 'hello'})
+        data = websocket.receive_json()
+        assert data == {'your_id': 'test', 'msg': {'msg': 'hello'}}
