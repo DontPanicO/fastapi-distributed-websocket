@@ -7,7 +7,8 @@ def _match_topic_with_wildcards(topic: str, pattern: str) -> bool:
         or '#' == pattern[:1]
         or pattern[:1] in (topic[:1], '+')
         and _match_topic_with_wildcards(
-            topic[1:], pattern['+' != pattern[:1] or (topic[:1] in '/') * 2 :]
+            topic[1:],
+            pattern['+' != pattern[:1] or (topic[:1] in '/') * 2:]  # fmt: skip
         )
     )
 

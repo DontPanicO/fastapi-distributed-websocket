@@ -5,11 +5,9 @@ __all__ = (
     'handle_subscription_message',
 )
 
-from typing import Any
-
 from ._connection import Connection
-from ._message import Message
 from ._exceptions import InvalidSubscriptionMessage
+from ._message import Message
 
 
 def is_subscription_message(message: Message) -> bool:
@@ -21,13 +19,16 @@ def _is_valid_subscription(topic: str) -> bool:
 
 
 def _check_subscription_message(message: Message) -> bool:
-    return is_subscription_message(message) and _is_valid_subscription(message.topic)
+    return is_subscription_message(message) and _is_valid_subscription(
+        message.topic
+    )
 
 
 def subscribe(connection: Connection, message: Message) -> None:
     if not _check_subscription_message(message):
         raise InvalidSubscriptionMessage(
-            f'"{message}" is not a valid subscription message', connection=connection
+            f'"{message}" is not a valid subscription message',
+            connection=connection,
         )
     connection.topics.add(message.topic)
 
@@ -35,13 +36,16 @@ def subscribe(connection: Connection, message: Message) -> None:
 def unsubscribe(connection: Connection, message: Message) -> None:
     if not _check_subscription_message(message):
         raise InvalidSubscriptionMessage(
-            f'"{message}" is not a valid subscription message', connection=connection
+            f'"{message}" is not a valid subscription message',
+            connection=connection,
         )
     if message.topic in connection.topics:
         connection.topics.remove(message.topic)
 
 
-def handle_subscription_message(connection: Connection, message: Message) -> None:
+def handle_subscription_message(
+    connection: Connection, message: Message
+) -> None:
     if message.typ == 'subscribe':
         subscribe(connection, message)
     else:

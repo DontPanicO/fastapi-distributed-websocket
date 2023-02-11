@@ -10,7 +10,6 @@ from typing import Any
 
 from .utils import update
 
-
 __VALID_TYPES = {
     'connect',
     'set_conn_id',
@@ -22,7 +21,12 @@ __VALID_TYPES = {
 }
 __SERVER_ONLY_TYPES = {'set_conn_id'}
 __CLIENT_ONLY_TYPES = {'connect'}
-__NULL_TOPIC_ALLOWED_TYPES = {'connect', 'set_conn_id', 'broadcast', 'send_by_conn_id'}
+__NULL_TOPIC_ALLOWED_TYPES = {
+    'connect',
+    'set_conn_id',
+    'broadcast',
+    'send_by_conn_id',
+}
 __REQUIRE_CONN_ID_TYPES = {'set_conn_id', 'send_by_conn_id'}
 
 
@@ -42,7 +46,11 @@ def tag_client_message(data: dict) -> Any:
 
 
 def validate_incoming_message(data: dict) -> None:
-    typ, topic, conn_id = data.get('type'), data.get('topic'), data.get('conn_id')
+    typ, topic, conn_id = (
+        data.get('type'),
+        data.get('topic'),
+        data.get('conn_id'),
+    )
     if not is_valid_type_client_message(data):
         raise ValueError(f'Invalid message type: {typ}')
     if topic is None and typ not in __NULL_TOPIC_ALLOWED_TYPES:

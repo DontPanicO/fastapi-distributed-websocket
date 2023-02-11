@@ -1,10 +1,9 @@
-__all__ = ['WebSocketProxy']
+__all__ = ('WebSocketProxy',)
 
 import asyncio
-from typing import Any
 
 import websockets
-from fastapi import WebSocket, WebSocketDisconnect
+from fastapi import WebSocket
 
 
 async def _forward(
@@ -30,6 +29,10 @@ class WebSocketProxy:
 
     async def __call__(self) -> None:
         async with websockets.connect(self._server_endpoint) as target:
-            self._forward_task = asyncio.create_task(_forward(self._client, target))
-            self._reverse_task = asyncio.create_task(_reverse(self._client, target))
+            self._forward_task = asyncio.create_task(
+                _forward(self._client, target)
+            )
+            self._reverse_task = asyncio.create_task(
+                _reverse(self._client, target)
+            )
             await asyncio.gather(self._forward_task, self._reverse_task)

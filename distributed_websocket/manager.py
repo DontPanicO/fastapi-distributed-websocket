@@ -1,29 +1,31 @@
 import asyncio
-from typing import Any, TypeVar
 from collections.abc import Callable, Coroutine, Iterator
+from typing import Any, TypeVar
 
 from fastapi import WebSocket, status
 
-from ._connection import Connection
-from .utils import clear_task, is_valid_broker, serialize
-from ._types import BrokerT
-from ._message import validate_incoming_message, untag_broker_message, Message
 from ._broker import create_broker
-from ._matching import matches
-from ._subscriptions import is_subscription_message, handle_subscription_message
-from ._exception_handlers import send_error_message
+from ._connection import Connection
 from ._decorators import ahandle
+from ._exception_handlers import send_error_message
 from ._exceptions import WebSocketException
-
+from ._matching import matches
+from ._message import Message, validate_incoming_message
+from ._subscriptions import (handle_subscription_message,
+                             is_subscription_message)
+from ._types import BrokerT
+from .utils import clear_task, is_valid_broker, serialize
 
 T = TypeVar('T')
 
 
-def _init_broker(url: str, broker_class: Any | None = None, **kwargs) -> BrokerT:
+def _init_broker(
+    url: str, broker_class: Any | None = None, **kwargs
+) -> BrokerT:
     if broker_class:
         assert is_valid_broker(
             broker_class
-        ), 'Invalid broker class. Use distributed_websocket.utils.is_valid_broker to check if your broker_class is valid.'
+        ), 'Invalid broker class. Use distributed_websocket.utils.is_valid_broker to check if your broker_class is valid.'  # noqa: E501
         return broker_class(**kwargs)
     return create_broker(url, **kwargs)
 
@@ -39,7 +41,9 @@ class WebSocketManager:
         self.active_connections: list[Connection] = []
         self._send_tasks: list[asyncio.Task] = []
         self._main_task: asyncio.Task | None = None
-        self.broker: BrokerT | None = _init_broker(broker_url, broker_class, **kwargs)
+        self.broker: BrokerT | None = _init_broker(
+            broker_url, broker_class, **kwargs
+        )
         self.broker_channel: str = broker_channel
 
     async def __aenter__(self) -> 'WebSocketManager':
@@ -121,7 +125,9 @@ class WebSocketManager:
                 asyncio.create_task(self._send_multi_by_conn_id(message))
             )
         else:
-            self._send_tasks.append(asyncio.create_task(self._send_by_conn_id(message)))
+            self._send_tasks.append(
+                asyncio.create_task(self._send_by_conn_id(message))
+            )
 
     def _get_outgoing_message_handler(
         self, message: Message
@@ -167,6 +173,8 @@ class WebSocketManager:
         for task in self._send_tasks:
             clear_task(task)
         for connection in self.active_connections:
-            await self.close_connection(connection, code=status.WS_1012_SERVICE_RESTART)
+            await self.close_connection(
+                connection, code=status.WS_1012_SERVICE_RESTART
+            )
         clear_task(self._main_task)
         await self.broker.disconnect()

@@ -1,8 +1,8 @@
-__all__ = ['WebSocketOAuth2PasswordBearer']
+__all__ = ('WebSocketOAuth2PasswordBearer',)
 
 from fastapi import WebSocket, status
-from fastapi.security.utils import get_authorization_scheme_param
 from fastapi.security import OAuth2PasswordBearer
+from fastapi.security.utils import get_authorization_scheme_param
 
 
 class WebSocketOAuth2PasswordBearer(OAuth2PasswordBearer):

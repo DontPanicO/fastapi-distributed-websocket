@@ -1,7 +1,7 @@
 __all__ = ('Connection',)
 
-from typing import Any, Callable
 from collections.abc import AsyncIterator, Coroutine
+from typing import Any, Callable
 
 from fastapi import WebSocket, status
 

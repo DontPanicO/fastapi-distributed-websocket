@@ -1,4 +1,5 @@
 __all__ = ('BrokerInterface', 'create_broker')
+
 import asyncio
 import json
 from abc import ABC, abstractmethod
@@ -106,7 +107,9 @@ class RedisBroker(BrokerInterface):
         await self._redis.publish(channel, message)
 
     async def get_message(self, **kwargs) -> Message | None:
-        message = await self._pubsub.get_message(ignore_subscribe_messages=True)
+        message = await self._pubsub.get_message(
+            ignore_subscribe_messages=True
+        )
         if message:
             typ, topic, conn_id, data = untag_broker_message(message['data'])
             return Message(data=data, typ=typ, topic=topic, conn_id=conn_id)
