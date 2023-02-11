@@ -88,7 +88,7 @@ async def test_manager_broadcast(
         conn_id = websocket.query_params['myid'] or 'connx'
         connection = await manager.new_connection(websocket, conn_id)
         connection.topics.add('tests/1')
-        async for m in connection.iter_json():
+        async for m in connection:
             await manager.receive(connection, m)
         manager.remove_connection(connection)
 
@@ -127,7 +127,7 @@ async def test_manager_send_01(
         conn_id = websocket.query_params['myid'] or 'connx'
         connection = await manager.new_connection(websocket, conn_id)
         connection.topics.add('tests/1')
-        async for m in connection.iter_json():
+        async for m in connection:
             await manager.receive(connection, m)
         manager.remove_connection(connection)
 
@@ -166,7 +166,7 @@ async def test_manager_send_02(
         conn_id = websocket.query_params['myid'] or 'connx'
         connection = await manager.new_connection(websocket, conn_id)
         connection.topics.add('tests/1')
-        async for m in connection.iter_json():
+        async for m in connection:
             await manager.receive(connection, m)
         manager.remove_connection(connection)
 
@@ -216,7 +216,7 @@ async def test_manager_send_by_conn_id_01(
         conn_id = websocket.query_params['myid'] or 'connx'
         connection = await manager.new_connection(websocket, conn_id)
         connection.topics.add('tests/1')
-        async for m in connection.iter_json():
+        async for m in connection:
             await manager.receive(connection, m)
         manager.remove_connection(connection)
 
@@ -266,7 +266,7 @@ async def test_manager_send_by_conn_id_02(
         conn_id = websocket.query_params['myid'] or 'connx'
         connection = await manager.new_connection(websocket, conn_id)
         connection.topics.add('tests/1')
-        async for m in connection.iter_json():
+        async for m in connection:
             await manager.receive(connection, m)
         manager.remove_connection(connection)
 
@@ -288,7 +288,7 @@ async def test_manager_send_by_conn_id_02(
 
         def get_msg1():
             nonlocal msg1
-            msg2 = w1.receive_json()
+            msg1 = w1.receive_json()
 
         signal.signal(signal.SIGALRM, get_msg1)
         msg2 = w2.receive_json()

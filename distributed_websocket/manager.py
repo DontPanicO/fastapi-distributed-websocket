@@ -10,9 +10,11 @@ from ._decorators import ahandle
 from ._exception_handlers import send_error_message
 from ._exceptions import WebSocketException
 from ._matching import matches
-from ._message import Message, validate_incoming_message
-from ._subscriptions import (handle_subscription_message,
-                             is_subscription_message)
+from ._message import Message
+from ._subscriptions import (
+    handle_subscription_message,
+    is_subscription_message,
+)
 from ._types import BrokerT
 from .utils import clear_task, is_valid_broker, serialize
 
@@ -140,20 +142,12 @@ class WebSocketManager:
     async def _publish_to_broker(self, message: Any) -> None:
         await self.broker.publish(self.broker_channel, message)
 
-    async def _handle_client_message(
-        self, connection: Connection, message: Message
-    ) -> None:
+    @ahandle(WebSocketException, send_error_message)
+    async def receive(self, connection: Connection, message: Message) -> None:
         if is_subscription_message(message):
             handle_subscription_message(connection, message)
         else:
             await self._publish_to_broker(serialize(message))
-
-    @ahandle(WebSocketException, send_error_message)
-    async def receive(self, connection: Connection, message: Any) -> None:
-        validate_incoming_message(message)
-        await self._handle_client_message(
-            connection, Message.from_client_message(data=message)
-        )
 
     async def _next_broker_message(self) -> Message:
         return await self.broker.get_message()
