@@ -83,9 +83,9 @@ class Message:
     def from_client_message(cls, *, data: dict) -> 'Message':
         return cls(
             data=data,
-            typ=data.get('type'),
-            topic=data.get('topic'),
-            conn_id=data.get('conn_id'),
+            typ=data.pop('type', None),
+            topic=data.pop('topic', None),
+            conn_id=data.pop('conn_id', None),
         )
 
     def __serialize__(self) -> dict[str, Any]:

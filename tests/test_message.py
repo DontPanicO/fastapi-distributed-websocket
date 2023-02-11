@@ -24,12 +24,7 @@ def test_message_02():
     m = Message.from_client_message(
         data={'msg': 'hello', 'type': 'send', 'topic': 'test', 'conn_id': 'test'}
     )
-    assert m.data == {
-        'msg': 'hello',
-        'type': 'send',
-        'topic': 'test',
-        'conn_id': 'test',
-    }
+    assert m.data == {'msg': 'hello'}
     assert m.typ == 'send'
     assert m.topic == 'test'
     assert m.conn_id == 'test'
