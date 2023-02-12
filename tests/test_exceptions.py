@@ -24,3 +24,7 @@ def test_websocket_exception(
             assert e.connection == connection
         else:
             assert False
+
+    test_client = test_client_factory(app)
+    with test_client.websocket_connect('/') as ws:
+        pass
