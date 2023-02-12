@@ -4,11 +4,11 @@ from collections.abc import Callable
 
 import pytest
 from starlette import status
-from starlette.types import Receive, Scope, Send
 from starlette.testclient import TestClient
+from starlette.types import Receive, Scope, Send
 from starlette.websockets import WebSocket, WebSocketDisconnect, WebSocketState
 
-from distributed_websocket import WebSocketManager, Connection, Message
+from distributed_websocket import Connection, Message, WebSocketManager
 
 
 def test_manager_01(
@@ -186,17 +186,25 @@ async def test_manager_send_02(
         await asyncio.sleep(0.01)
         msg1 = msg2 = None
 
+        def handle_alarm(sig, frame):
+            raise TimeoutError
+
+        signal.signal(signal.SIGALRM, handle_alarm)
+
         def get_msg1():
             nonlocal msg1
+            signal.alarm(1)
             msg1 = w1.receive_json()
 
         def get_msg2():
             nonlocal msg2
+            signal.alarm(1)
             msg2 = w2.receive_json()
 
-        signal.signal(signal.SIGALRM, get_msg1)
-        signal.signal(signal.SIGALRM, get_msg2)
-        signal.alarm(1)
+        with pytest.raises(TimeoutError):
+            get_msg1()
+            get_msg2()
+
         assert msg1 == msg2 == None
 
     await manager.shutdown()
@@ -236,17 +244,24 @@ async def test_manager_send_by_conn_id_01(
         await asyncio.sleep(0.01)
         msg1 = msg2 = None
 
+        def handle_alarm(sig, frame):
+            raise TimeoutError
+
+        signal.signal(signal.SIGALRM, handle_alarm)
+
         def get_msg1():
             nonlocal msg1
+            signal.alarm(1)
             msg1 = w1.receive_json()
 
         def get_msg2():
             nonlocal msg2
+            signal.alarm(1)
             msg2 = w2.receive_json()
 
-        signal.signal(signal.SIGALRM, get_msg1)
-        signal.signal(signal.SIGALRM, get_msg2)
-        signal.alarm(1)
+        with pytest.raises(TimeoutError):
+            get_msg1()
+            get_msg2()
         assert msg1 == msg2 == None
 
     await manager.shutdown()
@@ -286,13 +301,19 @@ async def test_manager_send_by_conn_id_02(
         await asyncio.sleep(0.01)
         msg1 = None
 
+        def handle_alarm(sig, frame):
+            raise TimeoutError
+
+        signal.signal(signal.SIGALRM, handle_alarm)
+
         def get_msg1():
             nonlocal msg1
+            signal.alarm(1)
             msg1 = w1.receive_json()
 
-        signal.signal(signal.SIGALRM, get_msg1)
+        with pytest.raises(TimeoutError):
+            get_msg1()
         msg2 = w2.receive_json()
-        signal.alarm(1)
         assert msg1 is None
         assert msg2 == {'msg': 'hello'}
 
