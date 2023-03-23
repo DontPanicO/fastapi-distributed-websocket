@@ -1,4 +1,4 @@
-redis==4.5.1
+redis==4.5.3
 black==23.1.0
 fastapi==0.93.0
 flake8==6.0.0
