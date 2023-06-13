@@ -1,6 +1,6 @@
 redis==4.5.4
 black==23.3.0
-fastapi==0.95.0
+fastapi==0.97.0
 flake8==6.0.0
 isort==5.12.0
 websockets==11.0.1
