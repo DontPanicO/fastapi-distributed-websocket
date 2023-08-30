@@ -67,8 +67,8 @@ class InMemoryBroker(BrokerInterface):
     async def get_message(self, **kwargs) -> Message | None:
         message = await self._messages.get()
         if self.has_subscribers(message['channel']):
-            typ, topic, conn_id, data = untag_broker_message(message['data'])
-            return Message(data=data, typ=typ, topic=topic, conn_id=conn_id)
+            type, topic, conn_id, data = untag_broker_message(message['data'])
+            return Message(data=data, type=type, topic=topic, conn_id=conn_id)
 
     def has_subscribers(self, channel: str) -> bool:
         return channel in self._subscribers
@@ -111,8 +111,8 @@ class RedisBroker(BrokerInterface):
             ignore_subscribe_messages=True
         )
         if message:
-            typ, topic, conn_id, data = untag_broker_message(message['data'])
-            return Message(data=data, typ=typ, topic=topic, conn_id=conn_id)
+            type, topic, conn_id, data = untag_broker_message(message['data'])
+            return Message(data=data, type=type, topic=topic, conn_id=conn_id)
 
 
 def _create_inmemory_broker() -> InMemoryBroker:

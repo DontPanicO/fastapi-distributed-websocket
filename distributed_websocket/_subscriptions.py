@@ -11,7 +11,7 @@ from ._message import Message
 
 
 def is_subscription_message(message: Message) -> bool:
-    return message.typ == 'subscribe' or message.typ == 'unsubscribe'
+    return message.type == 'subscribe' or message.type == 'unsubscribe'
 
 
 def _is_valid_subscription(topic: str) -> bool:
@@ -46,7 +46,7 @@ def unsubscribe(connection: Connection, message: Message) -> None:
 def handle_subscription_message(
     connection: Connection, message: Message
 ) -> None:
-    if message.typ == 'subscribe':
+    if message.type == 'subscribe':
         subscribe(connection, message)
     else:
         unsubscribe(connection, message)

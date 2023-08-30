@@ -134,7 +134,7 @@ class WebSocketManager:
     def _get_outgoing_message_handler(
         self, message: Message
     ) -> Callable[[Message], T | Coroutine[Any, Any, T]]:
-        return getattr(self, message.typ, self.send)
+        return getattr(self, message.type, self.send)
 
     def send_msg(self, message: Message) -> None:
         self._get_outgoing_message_handler(message)(message)

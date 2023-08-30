@@ -46,17 +46,17 @@ def tag_client_message(data: dict) -> Any:
 
 
 def validate_incoming_message(data: dict) -> None:
-    typ, topic, conn_id = (
+    type, topic, conn_id = (
         data.get('type'),
         data.get('topic'),
         data.get('conn_id'),
     )
     if not is_valid_type_client_message(data):
-        raise ValueError(f'Invalid message type: {typ}')
-    if topic is None and typ not in __NULL_TOPIC_ALLOWED_TYPES:
-        raise ValueError(f'Invalid message type "{typ}" with no topic')
-    if conn_id is None and typ in __REQUIRE_CONN_ID_TYPES:
-        raise ValueError(f'Invalid message type "{typ}" with no conn_id')
+        raise ValueError(f'Invalid message type: {type}')
+    if topic is None and type not in __NULL_TOPIC_ALLOWED_TYPES:
+        raise ValueError(f'Invalid message type "{type}" with no topic')
+    if conn_id is None and type in __REQUIRE_CONN_ID_TYPES:
+        raise ValueError(f'Invalid message type "{type}" with no conn_id')
 
 
 def untag_broker_message(data: dict | str) -> tuple:
@@ -70,11 +70,11 @@ class Message:
         self,
         *,
         data: Any,
-        typ: str,
+        type: str,
         topic: str | None = None,
         conn_id: str | list[str] | None = None,
     ) -> None:
-        self.typ = typ
+        self.type = type
         self.topic = topic
         self.conn_id = conn_id
         self.data = data
@@ -83,13 +83,13 @@ class Message:
     def from_client_message(cls, *, data: dict) -> 'Message':
         return cls(
             data=data,
-            typ=data.pop('type', None),
+            type=data.pop('type', None),
             topic=data.pop('topic', None),
             conn_id=data.pop('conn_id', None),
         )
 
     def __serialize__(self) -> dict[str, Any]:
-        self.data['type'] = self.typ
+        self.data['type'] = self.type
         self.data['topic'] = self.topic
         self.data['conn_id'] = self.conn_id
         return self.data

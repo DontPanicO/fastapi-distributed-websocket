@@ -25,7 +25,7 @@ def test_manager_01(
         manager.send(
             Message(
                 data={'msg': 'hello'},
-                typ='send',
+                type='send',
                 topic='tests/1',
             )
         )
@@ -55,7 +55,7 @@ def test_manager_02(
         manager.send(
             Message(
                 data={'msg': 'hello'},
-                typ='send',
+                type='send',
                 topic='tests/1',
             )
         )

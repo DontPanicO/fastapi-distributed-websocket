@@ -6,7 +6,7 @@ from distributed_websocket._message import Message, untag_broker_message
 def test_message_01():
     m = Message(
         data={'msg': 'hello'},
-        typ='send',
+        type='send',
         topic='test',
         conn_id='test',
     )
@@ -25,16 +25,16 @@ def test_message_02():
         data={'msg': 'hello', 'type': 'send', 'topic': 'test', 'conn_id': 'test'}
     )
     assert m.data == {'msg': 'hello'}
-    assert m.typ == 'send'
+    assert m.type == 'send'
     assert m.topic == 'test'
     assert m.conn_id == 'test'
 
 
 def test_untag_broker_message_01():
-    typ, topic, conn_id, data = untag_broker_message(
+    type, topic, conn_id, data = untag_broker_message(
         '{"msg": "hello", "type": "send", "topic": "test", "conn_id": "test"}'
     )
-    assert typ == 'send'
+    assert type == 'send'
     assert topic == 'test'
     assert conn_id == 'test'
     assert data == {'msg': 'hello'}
